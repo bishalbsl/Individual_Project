@@ -1,0 +1,164 @@
+body{
+  background-color: #EEE;
+    /*background-image:url(../images/8.jpg);*/
+  font-family: verdana;
+  background-position: center;
+}
+
+.text-center span{
+  margin-left: 40px;
+}
+
+.img-circular{
+ width: 200px;
+ height:200px;
+ background-image: url('../images/1.jpg');
+ background-size: cover;
+ border-radius: 100px;
+ -webkit-border-radius: 100px;
+ -moz-border-radius: 100px;
+}
+
+#navigation{
+  float: center;
+  font-size: 15px;
+  margin: 0px;
+  color: #846666;  
+  list-style-type: none;
+}
+
+#navigation .selected{
+  font-weight: bold;
+  }
+
+li a{
+  display: inline-block;
+  padding: 10px 12px;
+}
+
+a.active, #navigation a:hover{
+  background-color: lightgray;
+  color:red;
+}
+
+
+#footer{
+clear: both;
+padding: 0px;
+width: 200px;
+height: 50px;
+background-color: transparent;
+color: black;
+text-align: left;
+}
+
+.content{
+  position: absolute;
+  width: 1050px;
+  min-height: 620px;
+  height: auto;
+  right:1%;
+  top:1%;
+  background-color:gray;
+}
+
+.home{
+  position: absolute;
+  right: 0;
+  bottom: 100px;
+  color:white;
+  font-family: verdana;
+}
+
+.home h1{
+  top:50%;
+  font-size: 50px;
+  padding-right: 100px;
+  border-bottom: 1px solid white;
+  text-transform: uppercase;
+}
+
+.home h3{
+  font-size: 28px;
+  padding: 5px 0; 
+  opacity: 1px;
+}
+
+.aboutme{
+position: absolute;
+right: 0;
+top: 10%;
+color: white;
+font-family: verdana;
+display: none;
+}
+
+.aboutme h3{
+  top:1;
+  width: 110px;
+  margin-left: 50px;
+  background-color: lightgreen;
+  float: center;
+  display: inline;
+}
+
+.aboutme p{
+  margin-left: 50px;
+}
+
+.table{
+  background-color:#514242;
+  margin-left: 42px;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  font-family: arial;
+}
+
+.gallery{
+padding: 2px;
+position: absolute;
+display: none;
+margin-left:35px;
+top: 4%;
+color: white;
+font-family: verdana;
+}
+
+.gallery .images{
+  width: 25%
+  margin:4%;
+  float: left;
+}
+
+.images img{
+  width:150px;
+ height: 150px
+ }
+
+.career{
+position: absolute;
+right:40%;
+top: 10%;
+color: white;
+font-family: verdana;
+display: none;
+}
+
+.contactme{
+position: absolute;
+right:30%;
+top:5%;
+color: white;
+font-family: verdana;
+display: none;
+}
+
+
+
+
+
+
+

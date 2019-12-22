@@ -1,11 +1,11 @@
 body{
-  background-color: #EEE;
+  background-color: #EEE;/*background color of body*/
     /*background-image:url(../images/8.jpg);*/
   font-family: verdana;
   background-position: center;
 }
 
-.text-center span{
+.text-center span{/*class(text-center is call*/
   margin-left: 40px;
 }
 
@@ -41,17 +41,7 @@ a.active, #navigation a:hover{
   color:red;
 }
 
-
-#footer{
-clear: both;
-padding: 0px;
-width: 200px;
-height: 50px;
-background-color: transparent;
-color: black;
-text-align: left;
-}
-
+/*css for content class*/
 .content{
   position: absolute;
   width: 1050px;
@@ -141,7 +131,7 @@ font-family: verdana;
 .career{
 position: absolute;
 right:40%;
-top: 10%;
+top: 5%;
 color: white;
 font-family: verdana;
 display: none;

@@ -129,12 +129,12 @@ font-family: verdana;
  }
 
 .career{
-position: absolute;
-right:40%;
-top: 5%;
-color: white;
-font-family: verdana;
-display: none;
+  position: absolute;
+  right: 0;
+  top: 10%;
+  color: white;
+  font-family: verdana;
+  display: none;
 }
 
 .contactme{

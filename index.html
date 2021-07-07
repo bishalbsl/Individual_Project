@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta name="keyword" content="Bishal Shakya, portfolio" />
     <meta name="description" content="Front and back end developer" />
     <meta name="author" content="Shakya Bishal" />
@@ -14,178 +15,328 @@
 </head>
 
 <body>
-    <div class="text-center">
-        <div class="img-circular"></div>
-        <h2><a href="index.html">Bishal Shakya</a></h2>
-        <span><a href="">Welcome, Nice to meet you</a></span>
-    </div>
-    <hr/>
 
-    <div>
-        <ul id="navigation">
-            <li><a href="#" title="click here to go home page" class="a active ">HOME</a></li>
-            <li><a href="#" class="b">ABOUT</a></li>
-            <li><a href="#" class="c">PORTFOLIO</a></li>
-            <li><a href="#" class="d">CAREER</a></li>
-            <li><a href="#" class="e">CONTACT</a></li>
-        </ul>
-    </div>
-    <br/>
+    <nav class="navbar fixed-top shadow-sm navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-lg-5">
+        <a href="index.html" class="navbar-brand ml-lg-3">
+            <h1 class="m-0 display-5"><span class="text-primary">Bishal</span>Shakya</h1>
+        </a>
 
-    <hr/><br/>
-    <!--use mailto for address-->
-    <address>
-				<p> <b>Follow me on Social Media:</b></p>
-				<a href="https://www.facebook.com/bishalsl.shakya" class="fa fa-facebook"></a>&nbsp;&nbsp;&nbsp;&nbsp;
-				<a href="mailto:bsalsakya@gmail.com" class="fa fa-google"></a>&nbsp;&nbsp;&nbsp;&nbsp;
-				<a href="https://www.linkedin.com/in/bishal-shakya-631425132" class="fa fa-linkedin"></a>&nbsp;&nbsp;&nbsp;&nbsp;
-				
-			</address>
+        <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+    </button>
 
-    <div class="content">
-
-
-        <div class="home">
-            <h1>Hi!</h1>
-            <h1>I am Bishal Shakya</h1>
-            <h3>Web Developer</h3>
+        <div class="collapse navbar-collapse px-lg-3" id="navbarCollapse">
+            <div class="navbar-nav m-auto py-0">
+                <a href="#home" class="nav-item nav-link active">Home</a>
+                <a href="#about" class="nav-item nav-link">About</a>
+                <a href="#qualification" class="nav-item nav-link">Quality</a>
+                <a href="#skill" class="nav-item nav-link">Skill</a>
+                <a href="#portfolio" class="nav-item nav-link">Portfolio</a>
+            </div>
         </div>
+    </nav>
 
-        <div class="aboutme">
-            <h3>
-                WHO AM I?
-            </h3>
-            <p>
-                I am Bishal Shakya currently enrolled as English Mode student in a Web Business Technology Program under a concentration of Web Business System Development and learning different programming languages (PHP, Python, Android Mobile Application, Database)
-                at <abbr title="The Kyoto College of Graduate Studies for Informatics">KCGI, Japan.</abbr> I decided to study Computer because I have been interested in the IT field since childhood.Thus, I chose the Information Technology
-                field because I want to improve my IT skills and knowledge. I have studied Hardware and Network Engineering and then earned a bachelor’s degree in information management (BIM) in Nepal. Recently, I have worked as a Graduate Assistant and
-                Teacher Assistant at The Kyoto College of Graduate Studies for informatics.
-            </p>
-            <h3>SKILLS:</h3>
-            <p>
-                HTML
-                <progress value="90" max="100">
-						</progress>&nbsp;&nbsp; CSS
-                <progress value="80" max="100">
-						</progress><br/> JAVASCRIPT
-                <progress value="80" max="100">
-						</progress>&nbsp;&nbsp; ASP.NET
-                <progress value="85" max="100">
-						</progress> PHP
-                <progress value="70" max="100">
-						</progress>&nbsp;&nbsp; JAVA
-                <progress value="75" max="100">
-						</progress><br/> PYTHON
-                <progress value="65" max="100">
-						</progress>&nbsp;&nbsp; KOTLIN
-                <progress value="65" max="100">
-						</progress>
-            </p>
 
-            <h3>EDUCATION:</h3>
-            <p>
-                Master of Science in Information Technology (MSc. in IT)
-            </p>
-            <p>
-                Bachelor in Information Management(BIM)
-            </p>
-            <p>
-                Diploma of Hardware & Network Enginerring
-            </p>
 
-        </div>
+    <!-- Header Start -->
+    <div class="container-fluid bg-primary d-flex align-items-center mb-5 py-5" id="home" style="min-height: 100vh;">
+        <div class="container">
+            <div class="row align-items-center">
 
-        <div class="gallery">
+                <div class="col-lg-7 text-center text-lg-left">
+                    <h3 class="text-white font-weight-normal mb-3">Hello, my name</h3>
+                    <h1 class="display-3 text-uppercase text-primary mb-2" style="-webkit-text-stroke: 4px #ffffff;">Bishal Shakya</h1>
+                    <h1 class="typed-text-output d-inline font-weight-lighter text-white"></h1>
+                    <div class="typed-text d-none">Web Designer, Web Developer, Front End Developer, </div>
 
-            <div class="card">
-                <h3>E-Commerce Web Application</h3>
-                <div class="card-image waves-effect waves-block waves-light">
-                    <img class="activator" src="images/digipay.jpg" width="400px" height="200px">
+                </div>
+                <div class="col-lg-6 px-8 pl-lg-0 pb-5 pb-lg-4 about-img">
+                    <img class="img-fluid w-100 rounded-circle shadow-sm" src="images/1.jpg" alt="">
                 </div>
             </div>
+        </div>
+    </div>
+    <!-- Header End -->
 
+    <!-- About Start -->
+    <div class="container-fluid py-5" id="about">
+        <div class="container">
+            <div class="position-relative d-flex align-items-center justify-content-center">
+                <h1 class="display-1 text-uppercase text-white" style="-webkit-text-stroke: 1px #dee2e6;">About</h1>
+                <h1 class="position-absolute text-uppercase text-primary">About Me</h1>
+            </div>
+            <div class="row align-items-center">
+                <div class="col-lg-5 pb-4 pb-lg-0">
+                    <img class="img-fluid rounded w-100" src="images/1.jpg" alt="">
+                </div>
+                <div class="col-lg-7">
+                    <h3 class="mb-4">Web Developer</h3>
+                    <p>Currently enrolled as English Mode student in a Web Business Technology Program under a concentration of Web Business System Development and learning different programming languages (PHP, Python, Android Mobile Application, Database)
+                        at KCGI, Japan
+                    </p>
+                    <div class="row mb-3">
+                        <div class="col-sm-6 py-2">
+                            <h6>Name: <span class="text-secondary">Bishal Shakya</span></h6>
+                        </div>
+                        <div class="col-sm-6 py-2">
+                            <h6>Degree: <span class="text-secondary">Master</span></h6>
+                        </div>
+                        <div class="col-sm-6 py-2">
+                            <h6>Experience: <span class="text-secondary">2.5 Years</span></h6>
+                        </div>
+                        <div class="col-sm-6 py-2">
+                            <h6>Phone: <span class="text-secondary">+090 9852 1012</span></h6>
+                        </div>
+                        <div class="col-sm-6 py-2">
+                            <h6>Email: <span class="text-secondary">bsalsakya@gmail.com</span></h6>
+                        </div>
+                        <div class="col-sm-6 py-2">
+                            <h6>Address: <span class="text-secondary">Kyoto, Japan</span></h6>
+                        </div>
+                    </div>
 
-            <div class="card">
-                <h3>E-Commerce Web Application</h3>
-
-                <div class="card-image waves-effect waves-block waves-light">
-                    <img class="activator" src="images/visit_nepal.jpg" width="400px" height="200px">
                 </div>
             </div>
+        </div>
+    </div>
+    <!-- About End -->
 
-            <div class="card">
-                <div class="card-image waves-effect waves-block waves-light">
-                    <img class="activator" src="images/digipay.jpg" width="400px" height="200px">
+
+    <!-- Skill Start -->
+    <div class="container-fluid py-5" id="skill">
+        <div class="container">
+            <div class="position-relative d-flex align-items-center justify-content-center">
+                <h1 class="display-1 text-uppercase text-white" style="-webkit-text-stroke: 1px #dee2e6;">Skills</h1>
+                <h1 class="position-absolute text-uppercase text-primary">My Skills</h1>
+            </div>
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="skill mb-4">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="font-weight-bold">HTML</h6>
+                            <h6 class="font-weight-bold">90%</h6>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-primary" role="progressbar" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <div class="skill mb-4">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="font-weight-bold">CSS</h6>
+                            <h6 class="font-weight-bold">75%</h6>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <div class="skill mb-4">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="font-weight-bold">PHP</h6>
+                            <h6 class="font-weight-bold">60%</h6>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="skill mb-4">
+                        <div class="d-flex justify-content-between">
+
+                            <h6 class="font-weight-bold">Javascript</h6>
+                            <h6 class="font-weight-bold">70%</h6>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <div class="skill mb-4">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="font-weight-bold">C#</h6>
+                            <h6 class="font-weight-bold">95%</h6>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-dark" role="progressbar" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <div class="skill mb-4">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="font-weight-bold">Wordpress</h6>
+                            <h6 class="font-weight-bold">85%</h6>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-info" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-
-
         </div>
+    </div>
+    <!-- Skill End -->
 
-        <div class="career">
 
-            <h3>EXPERIENCE:</h3>
-            <br/><br/>
-            <table border="1px solid black" width="1000px" class="table">
-                <font color="black">
-                    <tr>
-                        <thead>
-                            <th>S.N</th>
-                            <th>Organization</th>
-                            <th>Position</th>
-                            <th>Year</th>
-                        </thead>
 
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>Classic Tech Pvt.Ltd.</td>
-                        <td>Field Supporter</td>
-                        <td>2011-2012</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Xclusive Minds Pvt. Ltd.</td>
-                        <td>Software Engineer</td>
-                        <td>2016-2017</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Vertex Web Surf Pvt. Ltd.</td>
-                        <td>ASP.Net developer</td>
-                        <td>2018-2019</td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>The Kyoto College of Graduate Studies for Informactics</td>
-                        <td>Graduate Assistant</td>
-                        <td>2020-2021</td>
-                    </tr>
-
-                </font>
-
-            </table>
-
+    <!-- Qualification Start -->
+    <div class="container-fluid py-5" id="qualification">
+        <div class="container">
+            <div class="position-relative d-flex align-items-center justify-content-center">
+                <h1 class="display-1 text-uppercase text-white" style="-webkit-text-stroke: 1px #dee2e6;">Quality</h1>
+                <h1 class="position-absolute text-uppercase text-primary">Education & Expericence</h1>
+            </div>
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h3 class="mb-4">My Education</h3>
+                    <div class="border-left border-primary pt-2 pl-4 ml-2">
+                        <div class="position-relative ex-me mb-4">
+                            <i class="far fa-dot-circle text-primary position-absolute" style="top: 2px; left: -35px; font-size: 22px;"></i>
+                            <h5 class="font-weight-bold mb-1">Bachelor of Science</h5>
+                            <p class="mb-2"><strong>Cambridge University</strong> | <small>2005 - 2009</small></p>
+                            <p>Tempor eos dolore amet tempor dolor tempor. Dolore ea magna sit amet dolor eirmod. Eos ipsum est tempor dolor. Clita lorem kasd sed ea lorem diam ea lorem eirmod duo sit ipsum stet lorem diam</p>
+                        </div>
+                        <div class="position-relative ex-me mb-4">
+                            <i class="far fa-dot-circle text-primary position-absolute" style="top: 2px; left: -35px;  font-size: 22px;"></i>
+                            <h5 class="font-weight-bold mb-1">Master In CSE</h5>
+                            <p class="mb-2"><strong>Cambridge University</strong> | <small>2009 - 2011</small></p>
+                            <p>Tempor eos dolore amet tempor dolor tempor. Dolore ea magna sit amet dolor eirmod. Eos ipsum est tempor dolor. Clita lorem kasd sed ea lorem diam ea lorem eirmod duo sit ipsum stet lorem diam</p>
+                        </div>
+                        <div class="position-relative ex-me mb-4">
+                            <i class="far fa-dot-circle text-primary position-absolute" style="top: 2px; left: -35px;  font-size: 22px;"></i>
+                            <h5 class="font-weight-bold mb-1">IIT Kharagpur</h5>
+                            <p class="mb-2"><strong>Cambridge University</strong> | <small>2011 - 2015</small></p>
+                            <p>Tempor eos dolore amet tempor dolor tempor. Dolore ea magna sit amet dolor eirmod. Eos ipsum est tempor dolor. Clita lorem kasd sed ea lorem diam ea lorem eirmod duo sit ipsum stet lorem diam</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <h3 class="mb-4">My Expericence</h3>
+                    <div class="border-left border-primary pt-2 pl-4 ml-2">
+                        <div class="position-relative ex-me mb-4">
+                            <i class="far fa-dot-circle text-primary position-absolute" style="top: 2px;left: -35px;  font-size: 22px;"></i>
+                            <h5 class="font-weight-bold mb-1">Web Designer</h5>
+                            <p class="mb-2"><strong>Soft Company</strong> | <small> Excellent</small></p>
+                            <p>Tempor eos dolore amet tempor dolor tempor. Dolore ea magna sit amet dolor eirmod. Eos ipsum est tempor dolor. Clita lorem kasd sed ea lorem diam ea lorem eirmod duo sit ipsum stet lorem diam</p>
+                        </div>
+                        <div class="position-relative ex-me mb-4">
+                            <i class="far fa-dot-circle text-primary position-absolute" style="top: 2px;left: -35px;  font-size: 22px;"></i>
+                            <h5 class="font-weight-bold mb-1">Artificial Intelligence</h5>
+                            <p class="mb-2"><strong>Soft Company</strong> | <small> Good</small></p>
+                            <p>Tempor eos dolore amet tempor dolor tempor. Dolore ea magna sit amet dolor eirmod. Eos ipsum est tempor dolor. Clita lorem kasd sed ea lorem diam ea lorem eirmod duo sit ipsum stet lorem diam</p>
+                        </div>
+                        <div class="position-relative ex-me mb-4">
+                            <i class="far fa-dot-circle text-primary position-absolute" style="top: 2px;left: -35px;  font-size: 22px;"></i>
+                            <h5 class="font-weight-bold mb-1">Web Development</h5>
+                            <p class="mb-2"><strong>Soft Company</strong> | <small> Excellent</small></p>
+                            <p>Tempor eos dolore amet tempor dolor tempor. Dolore ea magna sit amet dolor eirmod. Eos ipsum est tempor dolor. Clita lorem kasd sed ea lorem diam ea lorem eirmod duo sit ipsum stet lorem diam</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
+    <!-- Qualification End -->
 
-        <div class="contactme">
-            <address>Contact Address:</address>
-            <p>Ŧ 601-8022</p>
-            <p>Kyotoshi Minami-ku, Higashi-kujo Kita-matsunoki cho 8-3, Riverside</p>
-            <p>M: +819098521012</p>
-            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3269.1309162492544!2d135.76437191472561!3d34.978385375804024!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60010f494cd8380b%3A0xf19d28ffec0b587a!2s601-8022!5e0!3m2!1sen!2sjp!4v1576920083098!5m2!1sen!2sjp"
-                width="600" height="450" frameborder="0" style="border:0;" allowfullscreen=""></iframe>
+
+    <!-- Portfolio Start -->
+    <div class="container-fluid pt-5 pb-3" id="portfolio">
+        <div class="container">
+            <div class="position-relative d-flex align-items-center justify-content-center">
+                <h1 class="display-1 text-uppercase text-white" style="-webkit-text-stroke: 1px #dee2e6;">Gallery</h1>
+                <h1 class="position-absolute text-uppercase text-primary">My Portfolio</h1>
+            </div>
+
+            <div class="row portfolio-container">
+                <div class="col-lg-4 col-md-6 mb-4 portfolio-item first">
+                    <div class="position-relative overflow-hidden mb-2">
+                        <img class="img-fluid rounded w-100" src="images/visit_nepal.jpg" alt="">
+                        <div class="portfolio-btn bg-primary d-flex align-items-center justify-content-center">
+                            <a href="img/portfolio-1.jpg" data-lightbox="portfolio">
+                                <i class="fa fa-plus text-white" style="font-size: 60px;"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4 portfolio-item second">
+                    <div class="position-relative overflow-hidden mb-2">
+                        <img class="img-fluid rounded w-100" src="images/digipay.jpg" alt="">
+                        <div class="portfolio-btn bg-primary d-flex align-items-center justify-content-center">
+                            <a href="img/portfolio-2.jpg" data-lightbox="portfolio">
+                                <i class="fa fa-plus text-white" style="font-size: 60px;"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4 portfolio-item third">
+                    <div class="position-relative overflow-hidden mb-2">
+                        <img class="img-fluid rounded w-100" src="images/visit_nepal.jpg" alt="">
+                        <div class="portfolio-btn bg-primary d-flex align-items-center justify-content-center">
+                            <a href="img/portfolio-3.jpg" data-lightbox="portfolio">
+                                <i class="fa fa-plus text-white" style="font-size: 60px;"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4 portfolio-item first">
+                    <div class="position-relative overflow-hidden mb-2">
+                        <img class="img-fluid rounded w-100" src="images/digipay.jpg" alt="">
+                        <div class="portfolio-btn bg-primary d-flex align-items-center justify-content-center">
+                            <a href="img/portfolio-4.jpg" data-lightbox="portfolio">
+                                <i class="fa fa-plus text-white" style="font-size: 60px;"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4 portfolio-item second">
+                    <div class="position-relative overflow-hidden mb-2">
+                        <img class="img-fluid rounded w-100" src="images/visit_nepal.jpg" alt="">
+                        <div class="portfolio-btn bg-primary d-flex align-items-center justify-content-center">
+                            <a href="img/portfolio-5.jpg" data-lightbox="portfolio">
+                                <i class="fa fa-plus text-white" style="font-size: 60px;"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4 portfolio-item third">
+                    <div class="position-relative overflow-hidden mb-2">
+                        <img class="img-fluid rounded w-100" src="images/digipay.jpg" alt="">
+                        <div class="portfolio-btn bg-primary d-flex align-items-center justify-content-center">
+                            <a href="img/portfolio-6.jpg" data-lightbox="portfolio">
+                                <i class="fa fa-plus text-white" style="font-size: 60px;"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
+    <!-- Portfolio End -->
 
+    <!-- Footer Start -->
+    <div class="container-fluid bg-primary text-white mt-5 py-1 px-sm-1 px-md-5">
+        <div class="container text-center py-5">
+            <div class="d-flex justify-content-center mb-4">
+                <a class="btn btn-light btn-social mr-2" href="https://www.facebook.com/bishalsl.shakya"><i class="fa fa-facebook"></i></a>
+                <a class="btn btn-light btn-social mr-2" href="mailto:bsalsakya@gmail.com"><i class="fa fa-google"></i></a>
+                <a class="btn btn-light btn-social mr-2" href="https://www.linkedin.com/in/bishal-shakya-631425132"><i class="fa fa-linkedin"></i></a>
+            </div>
 
-
+            <p class="m-0">&copy; <a class="text-white font-weight-bold" href="#">Bishal</a>. @2021 All Rights Reserved.
+                <a class="text-white font-weight-bold" href="#"></a>
+            </p>
+        </div>
+    </div>
+    <!-- Footer End -->
 
     </div>
 
+    <!-- JavaScript Libraries -->
     <script type="text/javascript" src="JS/jquery-1.11.3.js"></script>
     <script type="text/javascript" src="JS/customJs.js"></script>
-
+    <script src="lib/typed/typed.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="lib/isotope/isotope.pkgd.min.js"></script>
+    <script src="lib/lightbox/js/lightbox.min.js"></script>
 </body>
 
 </html>

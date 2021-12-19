@@ -202,7 +202,7 @@ ul {
 video {
     background: #222;
     margin: 0 0 20px 0;
-    width: 100%;
+    /* width: 100%; */
 }
 
 @media (min-width: 550px) {

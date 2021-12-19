@@ -8,96 +8,107 @@
     <title>Capture Cam</title>
 
     <link rel="stylesheet" href="css/camera.css">
+
+
+    <style>
+        h1 {
+            margin: 0 0 24px 0;
+        }
+        
+        select {
+            width: 150px;
+        }
+        
+        video {
+            margin: 10px 0 0 0;
+        }
+    </style>
+
 </head>
 
 <body>
-    <div class="display-cover">
-        <video autoplay></video>
-        <canvas class="d-none"></canvas>
+    <div id="container">
 
-        <div class="video-options">
-            <select name="" id="" class="custom-select">
-                <option value="">Select camera</option>
-            </select>
+        <div class="select">
+            <label for="audioSource">Audio source: </label><select id="audioSource"></select>
         </div>
 
-
-        <div class="controls">
-            <button class="btn btn-danger play" title="Play"><i data-feather="play-circle"></i></button>
-            <button class="btn btn-info pause d-none" title="Pause"><i data-feather="pause"></i></button>
+        <div class="select">
+            <label for="videoSource">Video source: </label><select id="videoSource"></select>
         </div>
+
+        <video autoplay muted playsinline></video>
     </div>
 
-
     <script>
-        // data - feather.replace();
+        'use strict';
 
-        const controls = document.querySelector('.controls');
-        const cameraOptions = document.querySelector('.video-options>select');
-        const video = document.querySelector('video');
-        const canvas = document.querySelector('canvas');
-        // const screenshotImage = document.querySelector('img');
-        const buttons = [...controls.querySelectorAll('button')];
-        let streamStarted = false;
+        var videoElement = document.querySelector('video');
+        var audioSelect = document.querySelector('select#audioSource');
+        var videoSelect = document.querySelector('select#videoSource');
 
-        const [play, pause] = buttons;
+        audioSelect.onchange = getStream;
+        videoSelect.onchange = getStream;
 
-        const constraints = {
-            video: {
-                width: {
-                    min: 320,
-                    // ideal: 1920,
-                    max: 640,
+        getStream().then(getDevices).then(gotDevices);
+
+        function getDevices() {
+            // AFAICT in Safari this only gets default devices until gUM is called :/
+            return navigator.mediaDevices.enumerateDevices();
+        }
+
+        function gotDevices(deviceInfos) {
+            window.deviceInfos = deviceInfos; // make available to console
+            console.log('Available input and output devices:', deviceInfos);
+            for (const deviceInfo of deviceInfos) {
+                const option = document.createElement('option');
+                option.value = deviceInfo.deviceId;
+                if (deviceInfo.kind === 'audioinput') {
+                    option.text = deviceInfo.label || `Microphone ${audioSelect.length + 1}`;
+                    audioSelect.appendChild(option);
+                } else if (deviceInfo.kind === 'videoinput') {
+                    option.text = deviceInfo.label || `Camera ${videoSelect.length + 1}`;
+                    videoSelect.appendChild(option);
+                }
+            }
+        }
+
+        function getStream() {
+            if (window.stream) {
+                window.stream.getTracks().forEach(track => {
+                    track.stop();
+                });
+            }
+            const audioSource = audioSelect.value;
+            const videoSource = videoSelect.value;
+            const constraints = {
+                audio: {
+                    deviceId: audioSource ? {
+                        exact: audioSource
+                    } : undefined
                 },
-                height: {
-                    min: 240,
-                    // ideal: 1080,
-                    max: 480
-                },
-            }
-        };
+                video: {
+                    deviceId: videoSource ? {
+                        exact: videoSource
+                    } : undefined
+                }
+            };
+            return navigator.mediaDevices.getUserMedia(constraints).
+            then(gotStream).catch(handleError);
+        }
 
-        const getCameraSelection = async() => {
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            const videoDevices = devices.filter(device => device.kind === 'videoinput');
-            const options = videoDevices.map(videoDevice => {
-                return `<option value="${videoDevice.deviceId}">${videoDevice.label}</option>`;
-            });
-            cameraOptions.innerHTML = options.join('');
-        };
+        function gotStream(stream) {
+            window.stream = stream; // make stream available to console
+            audioSelect.selectedIndex = [...audioSelect.options].
+            findIndex(option => option.text === stream.getAudioTracks()[0].label);
+            videoSelect.selectedIndex = [...videoSelect.options].
+            findIndex(option => option.text === stream.getVideoTracks()[0].label);
+            videoElement.srcObject = stream;
+        }
 
-        play.onclick = () => {
-            if (streamStarted) {
-                video.play();
-                play.classList.add('d-none');
-                pause.classList.remove('d-none');
-                return;
-            }
-            if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
-                const updatedConstraints = {
-                    ...constraints,
-                    deviceId: {
-                        exact: cameraOptions.value
-                    }
-                };
-                startStream(updatedConstraints);
-            }
-        };
-
-        const startStream = async(constraints) => {
-            const stream = await navigator.mediaDevices.getUserMedia(constraints);
-            handleStream(stream);
-        };
-
-        const handleStream = (stream) => {
-            video.srcObject = stream;
-            play.classList.add('d-none');
-            pause.classList.remove('d-none');
-            // screenshot.classList.remove('d-none');
-            streamStarted = true;
-        };
-
-        getCameraSelection();
+        function handleError(error) {
+            console.error('Error: ', error);
+        }
     </script>
 </body>
 

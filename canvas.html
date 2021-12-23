@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Capture Cam</title>
 
-    <link rel="stylesheet" href="css/camera.css">
+    <!-- <link rel="stylesheet" href="css/camera.css"> -->
 
 
     <style>
@@ -19,7 +19,8 @@
             width: 150px;
         }
         
-        video {
+        video,
+        canvas {
             margin: 10px 0 0 0;
             /* width: 320;
             height: 240; */
@@ -34,26 +35,27 @@
         <!-- <div class="select">
             <label for="audioSource">Audio source: </label><select id="audioSource"></select>
         </div> -->
+        <button id="snap">Snap Photo</button>
+        <button id="snapStop">Stop Snap </button>
 
         <div class="select">
             <label for="videoSource">Select Camera: </label><select id="videoSource"></select>
         </div>
-        <video autoplay muted playsinline width="320" height="240"></video>
-        <!-- <video autoplay muted width="320" height="240"></video> -->
+        <video id="video" autoplay muted playsinline width="320" height="240"></video>
 
+        <canvas id="myCanvas" width="320" height="240"> </canvas>
 
     </div>
 
     <script>
-        // 'use strict';
+        var startSnap = true;
 
-        var videoElement = document.querySelector('video');
-        // var audioSelect = document.querySelector('select#audioSource');
+        var videoElement
+
+        videoElement = document.querySelector('video');
         var videoSelect = document.querySelector('select#videoSource');
-
         // audioSelect.onchange = getStream;
         videoSelect.onchange = getStream;
-
         getStream().then(getDevices).then(gotDevices);
 
         function getDevices() {
@@ -63,7 +65,7 @@
 
         function gotDevices(deviceInfos) {
             window.deviceInfos = deviceInfos; // make available to console
-            console.log('Available input and output devices:', deviceInfos);
+            // console.log('Available input and output devices:', deviceInfos);
             for (const deviceInfo of deviceInfos) {
                 const option = document.createElement('option');
                 option.value = deviceInfo.deviceId;
@@ -114,6 +116,50 @@
         function handleError(error) {
             console.error('Error: ', error);
         }
+
+        // Elements for taking the snapshot
+
+        var c = document.getElementById('myCanvas');
+        var ctx = c.getContext('2d');
+
+        function rectMake() {
+            if (startSnap == true) {
+                ctx.strokeStyle = "blue";
+                ctx.strokeRect(0, 0, 320, 240);
+
+
+                ctx.drawImage(videoElement, 0, 0, 640, 480, 0, 0, 126, 96);
+
+                ctx.strokeStyle = "gray"
+                ctx.moveTo(0, 120); // Begin first sub-path
+                ctx.lineTo(320, 120);
+
+                ctx.moveTo(160, 0); // Begin second sub-path
+                ctx.lineTo(160, 240);
+                ctx.stroke();
+            }
+
+        }
+
+
+        // Trigger photo take
+        document.getElementById("snap").addEventListener("click", function() {
+            // draw a white background
+
+            setInterval(() => {
+
+                rectMake()
+
+            }, 1000);
+
+
+
+        });
+        document.getElementById("snapStop").addEventListener("click", function() {
+            // draw a white background
+            startSnap = false
+            ctx.clearRect(0, 0, c.width, c.height);
+        });
     </script>
 </body>
 

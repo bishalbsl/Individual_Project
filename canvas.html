@@ -35,9 +35,9 @@
         <button id="snap">Snap Photo</button>
         <button id="snapStop">Stop Snap </button>
 
-        <!-- <div class="select">
+        <div class="select">
             <label for="videoSource">Select Camera: </label><select id="videoSource"></select>
-        </div> -->
+        </div>
         <video id="video" autoplay muted playsinline width="320" height="240"></video>
 
         <canvas id="myCanvas" width="320" height="240"> </canvas>
@@ -48,122 +48,126 @@
     <script>
         var startSnap = false;
         var videoElement = document.getElementById('video');
-        // var videoSelect = document.querySelector('select#videoSource');
+        var videoSelect = document.querySelector('select#videoSource');
 
         // videoSelect.onchange = stream;
-        navigator.permissions.query({
-            name: 'camera'
-        }).then(function(result) {
-            console.log(result.state)
-            if (result.state == 'granted') {
-                // if (window.stream) {
-                //     window.stream.getTracks().forEach(track => {
-                //         track.stop();
-                //     });
-                // }
+        // navigator.permissions.query({
+        //     name: 'camera'
+        // }).then(function(result) {
+        //     console.log(result.state)
+        //     if (result.state == 'granted') {
+        //         // if (window.stream) {
+        //         //     window.stream.getTracks().forEach(track => {
+        //         //         track.stop();
+        //         //     });
+        //         // }
 
-                navigator.mediaDevices.enumerateDevices().then((devices) => {
-                    devices = devices.filter((d) => d.kind === 'videoinput');
-                    console.log(devices)
+        //         navigator.mediaDevices.enumerateDevices().then((devices) => {
+        //             devices = devices.filter((d) => d.kind === 'videoinput');
+        //             console.log(devices)
 
-                    navigator.mediaDevices.getUserMedia({
-                            audio: true,
-                            video: {
-                                deviceId: devices[0].deviceId
-                            }
-                        }).then((stream) => {
-                            videoElement.srcObject = stream;
+        //             navigator.mediaDevices.getUserMedia({
+        //                     audio: true,
+        //                     video: {
+        //                         deviceId: devices[0].deviceId
+        //                     }
+        //                 }).then((stream) => {
+        //                     videoElement.srcObject = stream;
 
-                        })
-                        // .catch((err) => {
-                        //     // if (err ==
-                        //     //     "NotAllowedError: The request is not allowd by the user agent or the platform in the current context, possibly because the user denied permission."
-                        //     // ) {
-                        //     //     alert("カメラ")
-                        //     // } else {
-                        //     //     alert(err)
-                        //     // }
-                        //     alert(err)
-                        // })
-                });
-
-            } else if (result.state == 'prompt') {
-                console.log("prompt: " + result.state)
-                videoElement.srcObject.getVideoTracks().forEach(track => track.stop());
-
-
-            } else if (result.state == 'denied') {
-
-                console.log("please enable your camera")
-            }
-            result.onchange = function() {
-
-            };
-        });
-
-
-
-        // videoSelect.onchange = getStream;
-        // getStream().then(getDevices).then(gotDevices);
-
-        // function getDevices() {
-        //     // AFAICT in Safari this only gets default devices until gUM is called :/
-        //     return navigator.mediaDevices.enumerateDevices();
-        // }
-
-        // function gotDevices(deviceInfos) {
-        //     window.deviceInfos = deviceInfos; // make available to console
-        //     // console.log('Available input and output devices:', deviceInfos);
-        //     for (const deviceInfo of deviceInfos) {
-        //         const option = document.createElement('option');
-        //         option.value = deviceInfo.deviceId;
-        //         // if (deviceInfo.kind === 'audioinput') {
-        //         //     option.text = deviceInfo.label || `Microphone ${audioSelect.length + 1}`;
-        //         //     audioSelect.appendChild(option);
-        //         // } else 
-        //         if (deviceInfo.kind === 'videoinput') {
-        //             option.text = deviceInfo.label || `Camera ${videoSelect.length + 1}`;
-        //             videoSelect.appendChild(option);
-        //         }
-        //     }
-        // }
-
-        // function getStream() {
-        //     if (window.stream) {
-        //         window.stream.getTracks().forEach(track => {
-        //             track.stop();
+        //                 })
+        //                 // .catch((err) => {
+        //                 //     // if (err ==
+        //                 //     //     "NotAllowedError: The request is not allowd by the user agent or the platform in the current context, possibly because the user denied permission."
+        //                 //     // ) {
+        //                 //     //     alert("カメラ")
+        //                 //     // } else {
+        //                 //     //     alert(err)
+        //                 //     // }
+        //                 //     alert(err)
+        //                 // })
         //         });
+
+        //     } else if (result.state == 'prompt') {
+        //         console.log("prompt: " + result.state)
+        //         videoElement.srcObject.getVideoTracks().forEach(track => track.stop());
+
+
+        //     } else if (result.state == 'denied') {
+
+        //         console.log("please enable your camera")
         //     }
-        //     // const audioSource = audioSelect.value;
-        //     const videoSource = videoSelect.value;
-        //     const constraints = {
-        //         // audio: {
-        //         //     deviceId: audioSource ? {
-        //         //         exact: audioSource
-        //         //     } : undefined
-        //         // },
-        //         video: {
-        //             deviceId: videoSource ? {
-        //                 exact: videoSource
-        //             } : undefined
-        //         }
+        //     result.onchange = function() {
+
         //     };
-        //     return navigator.mediaDevices.getUserMedia(constraints).
-        //     then(gotStream).catch(handleError);
-        // }
+        // });
 
-        // function gotStream(stream) {
-        //     window.stream = stream; // make stream available to console
-        //     // audioSelect.selectedIndex = [...audioSelect.options].
-        //     // findIndex(option => option.text === stream.getAudioTracks()[0].label);
-        //     videoSelect.selectedIndex = [...videoSelect.options].
-        //     findIndex(option => option.text === stream.getVideoTracks()[0].label);
-        //     videoElement.srcObject = stream;
-        // }
 
-        // function handleError(error) {
-        //     console.error('Error: ', error);
-        // }
+
+        videoSelect.onchange = getStream;
+        getStream().then(getDevices).then(gotDevices);
+
+        function getDevices() {
+            // AFAICT in Safari this only gets default devices until gUM is called :/
+            return navigator.mediaDevices.enumerateDevices();
+        }
+
+        function gotDevices(deviceInfos) {
+            window.deviceInfos = deviceInfos; // make available to console
+            // console.log('Available input and output devices:', deviceInfos);
+            for (const deviceInfo of deviceInfos) {
+                const option = document.createElement('option');
+                option.value = deviceInfo.deviceId;
+                // if (deviceInfo.kind === 'audioinput') {
+                //     option.text = deviceInfo.label || `Microphone ${audioSelect.length + 1}`;
+                //     audioSelect.appendChild(option);
+                // } else 
+                if (deviceInfo.kind === 'videoinput') {
+                    option.text = deviceInfo.label || `Camera ${videoSelect.length + 1}`;
+                    videoSelect.appendChild(option);
+                }
+            }
+        }
+
+        function getStream() {
+            if (window.stream) {
+                window.stream.getTracks().forEach(track => {
+                    track.stop();
+                });
+            }
+            // const audioSource = audioSelect.value;
+            const videoSource = videoSelect.value;
+            const constraints = {
+                // audio: {
+                //     deviceId: audioSource ? {
+                //         exact: audioSource
+                //     } : undefined
+                // },
+                video: {
+                    deviceId: videoSource ? {
+                        exact: videoSource
+                    } : undefined
+                }
+            };
+            return navigator.mediaDevices.getUserMedia(constraints).
+            then(gotStream).catch(handleError);
+        }
+
+        function gotStream(stream) {
+            window.stream = stream; // make stream available to console
+            // audioSelect.selectedIndex = [...audioSelect.options].
+            // findIndex(option => option.text === stream.getAudioTracks()[0].label);
+            videoSelect.selectedIndex = [...videoSelect.options].
+            findIndex(option => option.text === stream.getVideoTracks()[0].label);
+            videoElement.srcObject = stream;
+        }
+
+        function handleError(error) {
+            if (error ==
+                "NotAllowedError: The request is not allowd by the user agent or the platform in the current context, possibly because the user denied permission."
+            )
+                alert("カメラ")
+            console.error('Error: ', error);
+        }
 
         // Elements for taking the snapshot
 

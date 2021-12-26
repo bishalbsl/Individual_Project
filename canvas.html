@@ -56,11 +56,11 @@
         }).then(function(result) {
             console.log(result.state)
             if (result.state == 'granted') {
-                if (window.stream) {
-                    window.stream.getTracks().forEach(track => {
-                        track.stop();
-                    });
-                }
+                // if (window.stream) {
+                //     window.stream.getTracks().forEach(track => {
+                //         track.stop();
+                //     });
+                // }
 
                 navigator.mediaDevices.enumerateDevices().then((devices) => {
                     devices = devices.filter((d) => d.kind === 'videoinput');
@@ -89,8 +89,11 @@
 
             } else if (result.state == 'prompt') {
                 console.log("prompt: " + result.state)
+                videoElement.srcObject.getVideoTracks().forEach(track => track.stop());
+
 
             } else if (result.state == 'denied') {
+
                 console.log("please enable your camera")
             }
             result.onchange = function() {

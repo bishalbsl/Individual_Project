@@ -21,7 +21,8 @@
         
         video,
         canvas {
-            margin: 10px 0 0 0;
+            position: absolute;
+            /* margin: 10px 0 0 0; */
             /* width: 320;
             height: 240; */
         }
@@ -39,13 +40,13 @@
         </div> -->
         <video id="video" autoplay muted playsinline width="320" height="240"></video>
 
-        <canvas id="myCanvas" width="320" height="240" hidden> </canvas>
+        <canvas id="myCanvas" width="320" height="240"> </canvas>
+        <canvas id="canvas" width="320" height="240"> </canvas>
 
     </div>
 
     <script>
-        var startSnap = true;
-
+        var startSnap = false;
         var videoElement = document.getElementById('video');
         // var videoSelect = document.querySelector('select#videoSource');
 
@@ -142,21 +143,21 @@
 
         // Elements for taking the snapshot
 
-        var c = document.getElementById('myCanvas');
+        var c = document.getElementById('canvas');
         var ctx = c.getContext('2d');
 
         function rectMake() {
+
             if (startSnap == true) {
                 ctx.strokeStyle = "blue";
-                ctx.strokeRect(0, 0, 320, 240);
 
 
-                ctx.drawImage(videoElement, 0, 0, 640, 480, 0, 0, 126, 96);
+                ctx.drawImage(videoElement, 0, 0, 640, 480, 0, 0, 96, 126);
+                ctx.strokeRect(70, 70, 160, 120);
 
                 ctx.strokeStyle = "gray"
                 ctx.moveTo(0, 120); // Begin first sub-path
                 ctx.lineTo(320, 120);
-
                 ctx.moveTo(160, 0); // Begin second sub-path
                 ctx.lineTo(160, 240);
                 ctx.stroke();
@@ -168,12 +169,12 @@
         // Trigger photo take
         document.getElementById("snap").addEventListener("click", function() {
             // draw a white background
-
+            startSnap = true;
             setInterval(() => {
 
                 rectMake()
 
-            }, 1000);
+            }, 1);
 
 
 

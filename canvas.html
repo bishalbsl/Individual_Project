@@ -35,7 +35,7 @@
         <button id="snap">Snap Photo</button>
         <button id="snapStop">Stop Snap </button>
 
-        <div class="select">
+        <div class="select" hidden>
             <label for="videoSource">Select Camera: </label><select id="videoSource"></select>
         </div>
         <video id="video" autoplay muted playsinline width="320" height="240"></video>
@@ -163,11 +163,15 @@
 
         function handleError(error) {
             if (error ==
-                "NotAllowedError: The request is not allowd by the user agent or the platform in the current context, possibly because the user denied permission."
-            )
-                alert("カメラ")
-            console.error('Error: ', error);
+                "NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission."
+            ) {
+                alert("カメラ");
+            } else {
+                console.error('Error: ', error);
+            }
         }
+
+
 
         // Elements for taking the snapshot
 

@@ -51,34 +51,51 @@
         // var videoSelect = document.querySelector('select#videoSource');
 
         // videoSelect.onchange = stream;
-
-
-        navigator.mediaDevices.enumerateDevices().then((devices) => {
-            devices = devices.filter((d) => d.kind === 'videoinput');
-            console.log(devices)
-            if (window.stream) {
-                window.stream.getTracks().forEach(track => {
-                    track.stop();
-                });
-            }
-            navigator.mediaDevices.getUserMedia({
-                audio: true,
-                video: {
-                    deviceId: devices[0].deviceId
+        navigator.permissions.query({
+            name: 'camera'
+        }).then(function(result) {
+            console.log(result.state)
+            if (result.state == 'granted') {
+                if (window.stream) {
+                    window.stream.getTracks().forEach(track => {
+                        track.stop();
+                    });
                 }
-            }).then((stream) => {
-                videoElement.srcObject = stream;
 
-            }).catch((err) => {
-                // if (err ==
-                //     "NotAllowedError: The request is not allowd by the user agent or the platform in the current context, possibly because the user denied permission."
-                // ) {
-                //     alert("カメラ")
-                // } else {
-                //     alert(err)
-                // }
-                alert(err)
-            })
+                navigator.mediaDevices.enumerateDevices().then((devices) => {
+                    devices = devices.filter((d) => d.kind === 'videoinput');
+                    console.log(devices)
+
+                    navigator.mediaDevices.getUserMedia({
+                            audio: true,
+                            video: {
+                                deviceId: devices[0].deviceId
+                            }
+                        }).then((stream) => {
+                            videoElement.srcObject = stream;
+
+                        })
+                        // .catch((err) => {
+                        //     // if (err ==
+                        //     //     "NotAllowedError: The request is not allowd by the user agent or the platform in the current context, possibly because the user denied permission."
+                        //     // ) {
+                        //     //     alert("カメラ")
+                        //     // } else {
+                        //     //     alert(err)
+                        //     // }
+                        //     alert(err)
+                        // })
+                });
+
+            } else if (result.state == 'prompt') {
+                console.log("prompt: " + result.state)
+
+            } else if (result.state == 'denied') {
+                console.log("please enable your camera")
+            }
+            result.onchange = function() {
+
+            };
         });
 
 

@@ -56,7 +56,11 @@
         navigator.mediaDevices.enumerateDevices().then((devices) => {
             devices = devices.filter((d) => d.kind === 'videoinput');
             console.log(devices)
-
+            if (window.stream) {
+                window.stream.getTracks().forEach(track => {
+                    track.stop();
+                });
+            }
             navigator.mediaDevices.getUserMedia({
                 audio: true,
                 video: {

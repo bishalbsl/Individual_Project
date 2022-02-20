@@ -9,7 +9,7 @@
                 <a class="btn btn-light btn-social mr-2" href="https://www.linkedin.com/in/bishal-shakya-631425132"><i class="fa fa-linkedin"></i></a>
             </div>
 
-            <p class="m-0">&copy; <a class="text-white font-weight-bold" href="#">Bishal</a>. @2021 All Rights Reserved.
+            <p class="m-0">&copy; <a class="text-white font-weight-bold" href="#">Bishal</a>. @2022 All Rights Reserved.
                 <a class="text-white font-weight-bold" href="#"></a>
             </p>
         </div>

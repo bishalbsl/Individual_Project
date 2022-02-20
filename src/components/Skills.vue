@@ -20,7 +20,7 @@
                     <div class="skill mb-4">
                         <div class="d-flex justify-content-between">
                             <h6 class="font-weight-bold">CSS</h6>
-                            <h6 class="font-weight-bold">75%</h6>
+                            <h6 class="font-weight-bold">85%</h6>
                         </div>
                         <div class="progress">
                             <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
@@ -41,7 +41,7 @@
                         <div class="d-flex justify-content-between">
 
                             <h6 class="font-weight-bold">Javascript</h6>
-                            <h6 class="font-weight-bold">70%</h6>
+                            <h6 class="font-weight-bold">80%</h6>
                         </div>
                         <div class="progress">
                             <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
@@ -59,7 +59,16 @@
                     <div class="skill mb-4">
                         <div class="d-flex justify-content-between">
                             <h6 class="font-weight-bold">Vuejs</h6>
-                            <h6 class="font-weight-bold">85%</h6>
+                            <h6 class="font-weight-bold">80%</h6>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-info" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <div class="skill mb-4">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="font-weight-bold">Python</h6>
+                            <h6 class="font-weight-bold">50%</h6>
                         </div>
                         <div class="progress">
                             <div class="progress-bar bg-info" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>

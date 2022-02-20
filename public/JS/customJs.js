@@ -1,5 +1,5 @@
 (function($) {
-    "use strict";
+    // "use strict";
 
     // Navbar on scrolling
     $(window).scroll(function() {

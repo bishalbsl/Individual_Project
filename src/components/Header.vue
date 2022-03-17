@@ -1,6 +1,6 @@
 <template>
        <!-- Header Start -->
-    <div class="container-fluid bg-primary d-flex align-items-center mb-5 py-5" id="home" style="min-height: 100vh;">
+    <div class="container-fluid bg-success d-flex align-items-center mb-5 py-5" id="home" style="min-height: 100vh;">
         <div class="container">
             <div class="row align-items-center">
 

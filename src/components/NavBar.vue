@@ -1,9 +1,10 @@
 
 <template>
 <div>
+
     <nav class="navbar fixed-top shadow-sm navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-lg-5">
         <a href="index.html" class="navbar-brand ml-lg-3">
-            <h1 class="m-0 display-5"><span class="text-primary">Bishal</span>Shakya</h1>
+            <h1 class="m-0 display-5"><span class="text-success">Bishal</span>Shakya</h1>
         </a>
 
         <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
@@ -22,6 +23,7 @@
             </div>
         </div>
     </nav>
+    
 </div>
 
     </template>

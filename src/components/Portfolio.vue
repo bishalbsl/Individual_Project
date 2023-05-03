@@ -60,9 +60,9 @@
                 </div>
                 <div class="col-lg-4 col-md-6 mb-4 portfolio-item third">
                     <div class="position-relative overflow-hidden mb-2">
-                        <img class="img-fluid rounded w-100" src="images/blog.jpg" alt="">
+                        <img class="img-fluid rounded w-50 h-30" src="images/MobileApp.jpg" alt="">
                         <div class="portfolio-btn bg-primary d-flex align-items-center justify-content-center">
-                            <a href="canvas.html" data-lightbox="portfolio">
+                            <a href="images/mobileapp.jpg" data-lightbox="portfolio">
                                 <i class="fa fa-plus text-white" style="font-size: 60px;"></i>
                             </a>
                         </div>

@@ -22,10 +22,10 @@
                             <h6>Degree: <span class="text-secondary">MSc. in IT</span></h6>
                         </div>
                         <div class="col-sm-6 py-2">
-                            <h6>Experience: <span class="text-secondary">2.5 Years</span></h6>
+                            <h6>Experience: <span class="text-secondary">2.5+ Years</span></h6>
                         </div>
                         <div class="col-sm-6 py-2">
-                            <h6>Phone: <span class="text-secondary">+090 9852 1012</span></h6>
+                            <h6>Phone: <span class="text-secondary">+8190-9852-1012</span></h6>
                         </div>
                         <div class="col-sm-6 py-2">
                             <h6>Email: <span class="text-secondary">bsalsakya@gmail.com</span></h6>

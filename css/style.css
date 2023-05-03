@@ -44,7 +44,7 @@ p {
 }
 
 .navbar-light {
-    display: none;
+    display: block;
 }
 
 .navbar-light .navbar-nav .nav-link {
@@ -71,6 +71,7 @@ p {
 .about-img {
     margin-left: -100px;
     right: -60px;
+    bottom: -10px;
 }
 
 .display-1 {
@@ -109,7 +110,7 @@ p {
 @media (max-width: 700px) {
     .about-img {
         margin-left: 20px;
-        right: 0px;
+        right: 10px;
         top: 30px;
     }
 }

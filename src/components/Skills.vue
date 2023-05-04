@@ -3,8 +3,8 @@
     <div class="container-fluid py-5" id="skill">
         <div class="container">
             <div class="position-relative d-flex align-items-center justify-content-center">
-                <h1 class="display-2 text-uppercase text-white" style="-webkit-text-stroke: 1px #dee2e6;">Skills</h1>
-                <h1 class="position-absolute text-uppercase text-success">My Skills</h1>
+                <h1 class="display-2 text-uppercase text-white" style="-webkit-text-stroke: 1px #dee2e6;">My Skills</h1>
+                <h1 class="position-absolute text-uppercase text-success">Skills</h1>
             </div>
             <div class="row align-items-center">
                 <div class="col-md-6">

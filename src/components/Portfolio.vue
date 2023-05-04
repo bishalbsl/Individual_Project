@@ -3,8 +3,8 @@
     <div class="container-fluid pt-5 pb-3" id="portfolio">
         <div class="container">
             <div class="position-relative d-flex align-items-center justify-content-center">
-                <h1 class="display-2 text-uppercase text-white" style="-webkit-text-stroke: 1px #dee2e6;">Gallery</h1>
-                <h1 class="position-absolute text-uppercase text-success">My Portfolio</h1>
+                <h1 class="display-2 text-uppercase text-white" style="-webkit-text-stroke: 1px #dee2e6;">My Gallery</h1>
+                <h1 class="position-absolute text-uppercase text-success">Portfolio</h1>
             </div>
 
             <div class="row portfolio-container">
@@ -60,9 +60,9 @@
                 </div>
                 <div class="col-lg-4 col-md-6 mb-4 portfolio-item third">
                     <div class="position-relative overflow-hidden mb-2">
-                        <img class="img-fluid rounded w-50 h-30" src="images/MobileApp.jpg" alt="">
-                        <div class="portfolio-btn bg-primary d-flex align-items-center justify-content-center">
-                            <a href="images/mobileapp.jpg" data-lightbox="portfolio">
+                        <img class="img-fluid rounded w-50 h-30" src="images/appImage.jpg" alt="">
+                        <div class="portfolio-btn bg-primary d-flex align-items-center justify-content-center ">
+                            <a href="images/appImage.jpg" data-lightbox="portfolio">
                                 <i class="fa fa-plus text-white" style="font-size: 60px;"></i>
                             </a>
                         </div>

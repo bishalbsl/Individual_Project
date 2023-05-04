@@ -44,7 +44,7 @@ p {
 }
 
 .navbar-light {
-    display: block;
+    display: none;
 }
 
 .navbar-light .navbar-nav .nav-link {

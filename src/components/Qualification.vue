@@ -14,14 +14,20 @@
                         <div class="position-relative ex-me mb-4">
                             <i class="far fa-dot-circle text-primary position-absolute" style="top: 2px; left: -35px;  font-size: 22px;"></i>
                             <h5 class="font-weight-bold mb-1">Master In Science in Information Technology</h5>
-                            <p class="mb-2"><strong>KCGI</strong> | <small>2019 - 2021</small></p>
+                            <p class="mb-2"><strong>KCGI, Kyoto, Japan</strong> | <small>2019 - 2021</small></p>
                             <p>Web Business System Development</p>
                         </div>
                         <div class="position-relative ex-me mb-4">
                             <i class="far fa-dot-circle text-primary position-absolute" style="top: 2px; left: -35px; font-size: 22px;"></i>
                             <h5 class="font-weight-bold mb-1">Bachelor in Information Management</h5>
-                            <p class="mb-2"><strong>Tribhuvan University</strong> | <small>2013 - 2017</small></p>
+                            <p class="mb-2"><strong>Tribhuvan University, Kathmandu, Nepal</strong> | <small>2013 - 2017</small></p>
                             <p>Information Technology and Management</p>
+                        </div>
+                        <div class="position-relative ex-me mb-4">
+                            <i class="far fa-dot-circle text-primary position-absolute" style="top: 2px; left: -35px; font-size: 22px;"></i>
+                            <h5 class="font-weight-bold mb-1">Diploma in Hardware and Network Engineering</h5>
+                            <p class="mb-2"><strong>DAV Institute of Information Technology, Nepal</strong> | <small>2010 - 2013</small></p>
+                            <p>ICT(Equivalent to Non-Gazetted First Class)</p>
                         </div>
 
                     </div>
@@ -41,7 +47,7 @@
                         <div class="position-relative ex-me mb-4">
                             <i class="far fa-dot-circle text-primary position-absolute" style="top: 2px;left: -35px;  font-size: 22px;"></i>
                             <h5 class="font-weight-bold mb-1">Software Engineer</h5>
-                            <p class="mb-2"><strong>Vertex Web Surf</strong> | <small> Jan 2017 to Dec 2017</small></p>
+                            <p class="mb-2"><strong>Xclusiveminds Pvt. Ltd., Nepal</strong> | <small> Jan 2017 to Dec 2017</small></p>
                             <p class="mb-2">• Design and Develop websites/web applications. </p>
                             <p class="mb-2">• Design relational databases that support web applications and websites. </p>
                             <p class="mb-2">• Develop e-commerce applications using Dot Net MVC and SQL server.</p>

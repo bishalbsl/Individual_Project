@@ -5,9 +5,9 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:online_communication/call_screen.dart';
 
-var loginToken = "";
-var loginKengenKbn = "";
-int? userNoId;
+var loginToken = "111";
+var loginKengenKbn = "1";
+int? userNoId = 1;
 
 class User {
   final String accessToken;
@@ -61,7 +61,7 @@ class _SelectorScreenState extends State<SelectorScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   String _errorMessage = '';
-  String _systemName = '', _googleMapConfig = '';
+  String _systemName = '', _googleMapConfig = '1';
   bool _isLogined = false;
   bool _isLoading = false;
 
@@ -189,22 +189,31 @@ class _SelectorScreenState extends State<SelectorScreen> {
   }
 
   void _checkLogin() async {
-    await loginUser(_userIdController.text, _passwordController.text);
-    if (_isLogined) {
-      await loadSystemName(loginToken);
-      _setTokenKengenKbn(loginToken, loginKengenKbn, userNoId!);
-      debugPrint('buttonPressed');
-      // ignore: use_build_context_synchronously
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                CallP2pMeshScreen(loginToken, title: _systemName)),
-      );
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    // await loginUser(_userIdController.text, _passwordController.text);
+    // if (_isLogined) {
+    //   await loadSystemName(loginToken);
+    //   _setTokenKengenKbn(loginToken, loginKengenKbn, userNoId!);
+    //   debugPrint('buttonPressed');
+    //   // ignore: use_build_context_synchronously
+    //   Navigator.push(
+    //     context,
+    //     MaterialPageRoute(
+    //         builder: (context) =>
+    //             CallP2pMeshScreen(loginToken, title: _systemName)),
+    //   );
+    //   setState(() {
+    //     _isLoading = false;
+    //   });
+    // }
+
+    _setTokenKengenKbn(loginToken, loginKengenKbn, userNoId!);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) =>
+              CallP2pMeshScreen(loginToken, title: _systemName)),
+    );
   }
 
   Future<User?> loginUser(String userId, String password) async {

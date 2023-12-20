@@ -15,7 +15,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'login_screen.dart';
 import 'screen_capture.dart';
 
-int? loginUserNo;
+int? loginUserNo = 1;
 String _roomName = '';
 List roomDataList = [];
 String? dropdownValue, selectedRoomCd, loginKengenKbn;
@@ -83,7 +83,8 @@ class CallP2pMeshScreen extends StatefulWidget {
 
 class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
   // signalling server url
-  final String websocketUrl = "http://10.100.9.7:5555";
+  // final String websocketUrl = "http://10.100.9.7:5555";
+  final String websocketUrl = "http://localhost:3500";
 
   // socket instance
   Socket? socket;
@@ -896,7 +897,7 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
           : "";
     }
     // ログを追加
-    await messageLog(endTime, widget.loginToken);
+    // await messageLog(endTime, widget.loginToken);
     setState(() {
       partnerUserNo = null;
       partnerMachineId = null;
@@ -951,123 +952,121 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
 
   Future<void> _connect() async {
     debugPrint("_connect:");
-    await checkPermission();
-    if (cameraMicGranted) {
-      await initRenderers();
-      // Connect the socket...
-      try {
-        socket = io(websocketUrl, {
-          "transports": ['websocket'],
-          "auth": {"key": "kOvEFJ3pBzvj8="},
-          'cors': {
-            'origin': 'localhost',
-            'credentials': true,
-          },
-        });
+    // await checkPermission();
+    // if (cameraMicGranted) {
+    await initRenderers();
+    // Connect the socket...
+    try {
+      socket = io(websocketUrl, {
+        "transports": ['websocket'],
+        "auth": {"key": "kOvEFJ3pBzvj8="},
+        'cors': {
+          'origin': 'localhost',
+          'credentials': true,
+        },
+      });
 
-        // listen onConnect event
-        socket!.on('connect', (data) async {
-          print('open socket:');
-          //Make an initial call
-          startCall();
+      // listen onConnect event
+      socket!.on('connect', (data) async {
+        print('open socket:');
+        //Make an initial call
+        startCall();
 
-          // 接続開始時間
-          startTime = DateTime.now();
-          await _checkLocationPermission();
-        });
+        // 接続開始時間
+        startTime = DateTime.now();
+        await _checkLocationPermission();
+      });
 
-        // listen for offer call from user
-        socket!.on('newCall', (data) async {
-          var description = data['sdpOffer'];
-          var pc = await _createPeerConnection();
-          peerConnection = pc;
+      // listen for offer call from user
+      socket!.on('newCall', (data) async {
+        var description = data['sdpOffer'];
+        var pc = await _createPeerConnection();
+        peerConnection = pc;
+        await pc.setRemoteDescription(
+            RTCSessionDescription(description['sdp'], description['type']));
+        await _createAnswer(pc);
+        if (remoteCandidates.length > 0) {
+          remoteCandidates.forEach((candidate) async {
+            await pc.addCandidate(candidate);
+          });
+          remoteCandidates.clear();
+        }
+      });
+
+      // listen for Remote IceCandidate
+      socket!.on("IceCandidate", (data) async {
+        print("GOT ICE candidate");
+        var candidateMap = data['iceCandidate'];
+        if (candidateMap != null) {
+          var pc = peerConnection;
+          RTCIceCandidate candidate = RTCIceCandidate(candidateMap['candidate'],
+              candidateMap['sdpMid'], candidateMap['sdpMLineIndex']);
+          if (pc != null) {
+            await pc.addCandidate(candidate);
+          } else {
+            remoteCandidates.add(candidate);
+          }
+        }
+      });
+
+      // Listen for call answer
+      socket!.on("callAnswered", (data) async {
+        print('callAnswered');
+        var description = data['sdpAnswer'];
+        var pc = peerConnection;
+        if (pc != null) {
           await pc.setRemoteDescription(
               RTCSessionDescription(description['sdp'], description['type']));
-          await _createAnswer(pc);
-          if (remoteCandidates.length > 0) {
-            remoteCandidates.forEach((candidate) async {
-              await pc.addCandidate(candidate);
-            });
-            remoteCandidates.clear();
-          }
-        });
-
-        // listen for Remote IceCandidate
-        socket!.on("IceCandidate", (data) async {
-          print("GOT ICE candidate");
-          var candidateMap = data['iceCandidate'];
-          if (candidateMap != null) {
-            var pc = peerConnection;
-            RTCIceCandidate candidate = RTCIceCandidate(
-                candidateMap['candidate'],
-                candidateMap['sdpMid'],
-                candidateMap['sdpMLineIndex']);
-            if (pc != null) {
-              await pc.addCandidate(candidate);
-            } else {
-              remoteCandidates.add(candidate);
-            }
-          }
-        });
-
-        // Listen for call answer
-        socket!.on("callAnswered", (data) async {
-          print('callAnswered');
-          var description = data['sdpAnswer'];
-          var pc = peerConnection;
-          if (pc != null) {
-            await pc.setRemoteDescription(
-                RTCSessionDescription(description['sdp'], description['type']));
-          }
-        });
-
-        socket!.on('receivedData', (data) {
-          _onDataReceived(data);
-        });
-
-        // ルームユーザーの接続を解除している時
-        socket!.on('disconnectUser', (data) {
-          print('inside disconnectUser');
-          if (!_disconnectUser) {
-            _leaveRoom();
-            _disconnect();
-            endFlgUpdate(widget.loginToken, selectedRoomCd!);
-            _showCallLog();
-            _resetState();
-          }
-          _disconnectUser = true;
-        });
-
-        socket!.connect();
-
-        // create and join room
-        socket!.emit("createRoom", {
-          "roomId": _roomName,
-        });
-
-        socket!.on('error', (data) async {
-          print('error$data');
-          if ('error$data' == 'error{message: Invalid key}') {
-            endFlgUpdate(widget.loginToken, selectedRoomCd!);
-            _resetState();
-            showCustomAlertDialog(context, 'エラー', '認証キーが一致しません。');
-            socket!.close();
-          }
-        });
-      } catch (e) {
-        print('socket_error: $e');
-      }
-    } else {
-      setState(() {
-        callButtonBackgroundColor = const Color(0xFF00698D);
-        callButtonText = '接続開始';
-        callButtonState = 1;
+        }
       });
-      endFlgUpdate(widget.loginToken, selectedRoomCd!);
-      // ignore: use_build_context_synchronously
-      showCustomAlertDialog(
-          context, 'エラー', 'カメラ・マイクアクセスが禁止されています。カメラ・マイクを許可してください。');
+
+      socket!.on('receivedData', (data) {
+        _onDataReceived(data);
+      });
+
+      // ルームユーザーの接続を解除している時
+      socket!.on('disconnectUser', (data) {
+        print('inside disconnectUser');
+        if (!_disconnectUser) {
+          _leaveRoom();
+          _disconnect();
+          // endFlgUpdate(widget.loginToken, selectedRoomCd!);
+          _showCallLog();
+          _resetState();
+        }
+        _disconnectUser = true;
+      });
+
+      socket!.connect();
+
+      // create and join room
+      socket!.emit("createRoom", {
+        "roomId": _roomName,
+      });
+
+      socket!.on('error', (data) async {
+        print('error$data');
+        if ('error$data' == 'error{message: Invalid key}') {
+          // endFlgUpdate(widget.loginToken, selectedRoomCd!);
+          _resetState();
+          showCustomAlertDialog(context, 'エラー', '認証キーが一致しません。');
+          socket!.close();
+        }
+      });
+    } catch (e) {
+      print('socket_error: $e');
     }
+    // } else {
+    //   setState(() {
+    //     callButtonBackgroundColor = const Color(0xFF00698D);
+    //     callButtonText = '接続開始';
+    //     callButtonState = 1;
+    //   });
+    //   // endFlgUpdate(widget.loginToken, selectedRoomCd!);
+    //   // ignore: use_build_context_synchronously
+    //   showCustomAlertDialog(
+    //       context, 'エラー', 'カメラ・マイクアクセスが禁止されています。カメラ・マイクを許可してください。');
+    // }
   }
 
   startCall() async {
@@ -1111,20 +1110,24 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
   }
 
   Future<MediaStream> createStream() async {
+    // final Map<String, dynamic> mediaConstraints = {
+    //   'audio': true,
+    //   'video': isVideoOn
+    //       ? {
+    //           'facingMode': isFrontCameraSelected ? 'user' : 'environment',
+    //           'mandatory': {
+    //             'minWidth':
+    //                 '640', // Provide your own width, height and frame rate here
+    //             'minHeight': '480',
+    //             'minFrameRate': '30',
+    //           },
+    //           'optional': [],
+    //         }
+    //       : false,
+    // };
     final Map<String, dynamic> mediaConstraints = {
       'audio': true,
-      'video': isVideoOn
-          ? {
-              'facingMode': isFrontCameraSelected ? 'user' : 'environment',
-              'mandatory': {
-                'minWidth':
-                    '640', // Provide your own width, height and frame rate here
-                'minHeight': '480',
-                'minFrameRate': '30',
-              },
-              'optional': [],
-            }
-          : false,
+      'video': true
     };
 
     MediaStream stream =
@@ -1160,7 +1163,7 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
     };
 
     //スピーカーフォンをオンにする
-    _localStream!.getAudioTracks()[0].enableSpeakerphone(true);
+    // _localStream!.getAudioTracks()[0].enableSpeakerphone(true);
 
     pc.onIceConnectionState = (state) {
       print('onIceConnectionState $state');
@@ -1334,7 +1337,7 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
                   _resetState();
                   _leaveRoom();
                   _disconnect();
-                  endFlgUpdate(widget.loginToken, selectedRoomCd!);
+                  // endFlgUpdate(widget.loginToken, selectedRoomCd!);
                   Navigator.of(context).pop();
                   _showCallLog();
                 });
@@ -1373,7 +1376,7 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
                 // Handle the "OK" button click as before
                 _leaveRoom();
                 _disconnect();
-                endFlgUpdate(widget.loginToken, selectedRoomCd!);
+                // endFlgUpdate(widget.loginToken, selectedRoomCd!);
                 Navigator.of(context).pop();
                 SharedPreferences pref = await SharedPreferences.getInstance();
                 pref.remove('TOKEN');
@@ -1465,10 +1468,25 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
       'Accept': 'application/json',
       "Authorization": "Bearer $loginToken"
     };
-    var response = await http.get(Uri.parse("$baseUrl/Room/CanUseList/"),
-        headers: headers);
-    if (response.statusCode == 200) {
-      var decodedData = jsonDecode(response.body);
+    // var response = await http.get(Uri.parse("$baseUrl/Room/CanUseList/"),
+    //     headers: headers);
+    List<Map<String, dynamic>> roomList = [
+      {
+        'roomCD': 'room1',
+        'roomId': '001',
+        'roomName': 'roomOne',
+      }
+    ];
+
+    // Create the body map with the roomList
+    Map<String, dynamic> body = {'roomList': roomList};
+
+    // Convert the Dart Map to JSON format
+    var response = jsonEncode(body);
+
+    // if (response.statusCode == 200) {
+    if (response != null) {
+      var decodedData = jsonDecode(response);
       if (loginKengenKbn == '3') {
         selectedRoomCd = decodedData['roomList'][0]['roomCD'];
         getRoomConnectionStatus(widget.loginToken, selectedRoomCd!);
@@ -1517,18 +1535,38 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
   // ルーム作成・接続を作成
   Future<void> createConnection(
       String loginToken, String roomNo, int waitUser) async {
-    final response = await http.post(
-      Uri.parse("$baseUrl/Room/CreateConnection"),
-      headers: <String, String>{
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $loginToken',
+    // final response = await http.post(
+    //   Uri.parse("$baseUrl/Room/CreateConnection"),
+    //   headers: <String, String>{
+    //     'Content-Type': 'application/json',
+    //     'Authorization': 'Bearer $loginToken',
+    //   },
+    //   body: jsonEncode(<String, dynamic>{
+    //     'roomNo': roomNo,
+    //     'waitUserNo': waitUser,
+    //   }),
+    // );
+    // if (response.statusCode == 200) {
+    // if (response.statusCode == 200) {
+    List<Map<String, dynamic>> userList = [
+      {
+        'userName': 'admin',
+        'userNo': 1,
+        'delFlg': false,
       },
-      body: jsonEncode(<String, dynamic>{
-        'roomNo': roomNo,
-        'waitUserNo': waitUser,
-      }),
-    );
-    if (response.statusCode == 200) {
+      {
+        'userName': 'user',
+        'userNo': 2,
+        'delFlg': false,
+      }
+    ];
+
+    // Create the body map with the userList
+    Map<String, dynamic> body = {'userList': userList};
+
+    // Convert the Dart Map to JSON format
+    var response = jsonEncode(body);
+    if (response != null) {
       debugPrint("sucess: $response");
       setState(() {
         newConnectionNo = newConnectionNo! + 1;
@@ -1547,20 +1585,25 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
       'Accept': 'application/json',
       "Authorization": "Bearer $loginToken"
     };
-    var response =
-        await http.get(Uri.parse('$baseUrl/User/MyInfo/'), headers: headers);
-    if (response.statusCode == 200) {
-      var list = response.body;
-      debugPrint('loadMyInfo: $list');
-      var decodedData = jsonDecode(response.body);
-      setState(() {
-        myUserNo = decodedData['userNo'];
-        machineId = decodedData['machineId'];
-        tantoNo = decodedData['tantoNo'];
-      });
-    } else {
-      debugPrint('loadMyInfo failed');
-    }
+    // var response =
+    //     await http.get(Uri.parse('$baseUrl/User/MyInfo/'), headers: headers);
+    // if (response.statusCode == 200) {
+    //   var list = response.body;
+    //   debugPrint('loadMyInfo: $list');
+    //   var decodedData = jsonDecode(response.body);
+    //   setState(() {
+    //     myUserNo = decodedData['userNo'];
+    //     machineId = decodedData['machineId'];
+    //     tantoNo = decodedData['tantoNo'];
+    //   });
+    // } else {
+    //   debugPrint('loadMyInfo failed');
+    // }
+    setState(() {
+      myUserNo = 1;
+      machineId = 'machine1';
+      tantoNo = 11;
+    });
   }
 
   // 接続したいルームの状況を取得
@@ -1570,18 +1613,26 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
       'Accept': 'application/json',
       "Authorization": "Bearer $loginToken"
     };
-    var response = await http.get(
-        Uri.parse('$baseUrl/Room/SetRoomConnection?roomNo=$roomNo'),
-        headers: headers);
-    if (response.statusCode == 200) {
-      var list = response.body;
-      debugPrint(list);
-      var decodedData = jsonDecode(response.body);
+    // var response = await http.get(
+    //     Uri.parse('$baseUrl/Room/SetRoomConnection?roomNo=$roomNo'),
+    //     headers: headers);
+    // if (response.statusCode == 200) {
+    var response = {};
+    if (response != null) {
+      // var list = response.body;
+      // debugPrint(list);
+      // var decodedData = jsonDecode(response.body);
+      // setState(() {
+      //   newConnectionNo = decodedData['roomList'][0]['connectionNo'];
+      //   waitUserNo = decodedData['roomList'][0]['waitUserNo'];
+      //   secondUserNo = decodedData['roomList'][0]['secondUserNo'];
+      //   _endFlg = decodedData['roomList'][0]['endFlg'];
+      // });
       setState(() {
-        newConnectionNo = decodedData['roomList'][0]['connectionNo'];
-        waitUserNo = decodedData['roomList'][0]['waitUserNo'];
-        secondUserNo = decodedData['roomList'][0]['secondUserNo'];
-        _endFlg = decodedData['roomList'][0]['endFlg'];
+        newConnectionNo = 1;
+        waitUserNo = 1;
+        secondUserNo = null;
+        _endFlg = false;
       });
 
       if (loginKengenKbn == '3') {
@@ -1595,7 +1646,7 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
               context, 'エラー', 'すでに二人がこのルームを利用しています。別のルームを選択するか、担当者に連絡してください。');
         } else {
           // 接続状況を更新
-          connectionUpdate(widget.loginToken, selectedRoomCd!, loginUserNo!);
+          // connectionUpdate(widget.loginToken, selectedRoomCd!, loginUserNo!);
           _connect();
           setState(() {
             isCallButtonEnabled = false;
@@ -1685,11 +1736,30 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
       'Accept': 'application/json',
       "Authorization": "Bearer $loginToken"
     };
-    var response =
-        await http.get(Uri.parse('$baseUrl/User/List/'), headers: headers);
+    // var response =
+    //     await http.get(Uri.parse('$baseUrl/User/List/'), headers: headers);
 
-    if (response.statusCode == 200) {
-      var decodedData = json.decode(response.body);
+    // if (response.statusCode == 200) {
+    List<Map<String, dynamic>> userList = [
+      {
+        'userName': 'admin',
+        'userNo': 1,
+        'delFlg': false,
+      },
+      {
+        'userName': 'user',
+        'userNo': 2,
+        'delFlg': false,
+      }
+    ];
+
+    // Create the body map with the userList
+    Map<String, dynamic> body = {'userList': userList};
+
+    // Convert the Dart Map to JSON format
+    var response = jsonEncode(body);
+    if (response != null) {
+      var decodedData = json.decode(response);
       final List<dynamic> data = decodedData['userList'];
       // delFlg・loginUserNo を使用してユーザーをfilterする
       final List<User> users = data

@@ -81,10 +81,11 @@ class CallP2pMeshScreen extends StatefulWidget {
   _CallP2pMeshScreenState createState() => _CallP2pMeshScreenState();
 }
 
-class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
-  // signalling server url
-  // final String websocketUrl = "http://10.100.9.7:5555";
-  final String websocketUrl = "http://localhost:3500";
+class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
+    with WidgetsBindingObserver {
+    // signalling server url
+  final String websocketUrl = "http://10.100.9.7:5555";
+  // final String websocketUrl = "http://localhost:3500";
 
   // socket instance
   Socket? socket;
@@ -178,8 +179,21 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
   int? partnerUserNo, updateLogNo;
   String? partnerMachineId;
 
+ @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    //Androidのみ、アプリが前進するとローカルビデオを再開
+    if (state == AppLifecycleState.resumed &&
+        isConnected &&
+        shareScreenButtonState != 2 &&
+        WebRTC.platformIsAndroid) {
+      resumeLocalStream();
+    }
+  }
+
+
   @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
     init();
   }
@@ -219,24 +233,35 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
       }
     }
     _locationData = await location.getLocation();
-    setState(() {
-      ownLat = _locationData.latitude!;
-      ownLng = _locationData.longitude!;
-      if (_hasRemoteStream) {
-        // 位置情報を送信する
-        _sendRealTimeMapInfo();
-      }
-    });
-    location.onLocationChanged.listen((LocationData currentLocation) {
+     if (_hasRemoteStream && mounted) {
       setState(() {
-        ownLat = currentLocation.latitude!;
-        ownLng = currentLocation.longitude!;
-        if (_hasRemoteStream) {
+        ownLat = _locationData.latitude!;
+        ownLng = _locationData.longitude!;
+        //if (_hasRemoteStream) {
           // 位置情報を送信する
           _sendRealTimeMapInfo();
-        }
+        //}
       });
+     }
+     // Start listening to location changes and store the subscription
+    locationSubscription = location.onLocationChanged.listen((LocationData currentLocation) {
+      if (_hasRemoteStream && mounted) {
+        setState(() {
+          ownLat = currentLocation.latitude!;
+          ownLng = currentLocation.longitude!;
+          //if (_hasRemoteStream) {
+            // 位置情報を送信する
+            _sendRealTimeMapInfo();
+          //}
+        });
+      }
     });
+  }
+
+  
+  // Add a method to stop listening to location updates
+  Future<void>  stopListeningToLocation() async{
+   await locationSubscription?.cancel();
   }
 
   void _getDeviceInfo() async {
@@ -253,10 +278,12 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
     };
     String jsonStringlatLng = jsonEncode(latLng);
     debugPrint('send mapinfo:$jsonStringlatLng');
-    socket!.emit('sendData', {
-      "roomId": _roomName,
-      "data": jsonStringlatLng,
-    });
+    if(socket != null){
+      socket!.emit('sendData', {
+        "roomId": _roomName,
+        "data": jsonStringlatLng,
+      });
+    }
   }
 
   Future<void> _initCustomMarkerIcon() async {
@@ -898,11 +925,13 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
     }
     // ログを追加
     // await messageLog(endTime, widget.loginToken);
-    setState(() {
-      partnerUserNo = null;
-      partnerMachineId = null;
-      updateLogNo = null;
-    });
+    if(mounted){
+      setState(() {
+        partnerUserNo = null;
+        partnerMachineId = null;
+        updateLogNo = null;
+      });
+    }
     // ignore: use_build_context_synchronously
     showCustomAlertDialog(context, '情報', message);
   }
@@ -918,9 +947,11 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
     // Now, check the permission status and set the state accordingly.
     if (statuses[permission.Permission.camera]!.isGranted &&
         statuses[permission.Permission.microphone]!.isGranted) {
-      setState(() {
-        cameraMicGranted = true;
-      });
+      if(mounted){
+        setState(() {
+          cameraMicGranted = true;
+        });
+      }
     }
   }
 
@@ -970,7 +1001,7 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
       socket!.on('connect', (data) async {
         print('open socket:');
         //Make an initial call
-        startCall();
+        if(mounted)startCall();
 
         // 接続開始時間
         startTime = DateTime.now();
@@ -982,6 +1013,13 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
         var description = data['sdpOffer'];
         var pc = await _createPeerConnection();
         peerConnection = pc;
+        // if (pc.connectionState == RTCSignalingState.RTCSignalingStateStable) {
+        //   await pc.setRemoteDescription(
+        //       RTCSessionDescription(description['sdp'], description['type']));
+        // } else {
+        //   // Handle the case where the connection state is not stable
+        //   print('Connection state is not stable for setRemoteDescription');
+        // }
         await pc.setRemoteDescription(
             RTCSessionDescription(description['sdp'], description['type']));
         await _createAnswer(pc);
@@ -991,6 +1029,8 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
           });
           remoteCandidates.clear();
         }
+        //  peerConnection = pc;
+
       });
 
       // listen for Remote IceCandidate
@@ -1018,10 +1058,25 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
           await pc.setRemoteDescription(
               RTCSessionDescription(description['sdp'], description['type']));
         }
+        // var state = peerConnection!.onSignalingState;
+        // print('peerConnectionState: $state');
+        // if (peerConnection!.connectionState == RTCSignalingState.RTCSignalingStateStable) {
+        //   await peerConnection!.setRemoteDescription(
+        //       RTCSessionDescription(description['sdp'], description['type']));
+        // } else {
+        //   // Handle the case where the connection state is not stable
+        //   print('Connection state is not stable for setRemoteDescription');
+        // }
+        // if (peerConnection != null) {
+        //   await peerConnection!.setRemoteDescription(
+        //       RTCSessionDescription(description['sdp'], description['type']));
+        // }
       });
 
       socket!.on('receivedData', (data) {
-        _onDataReceived(data);
+        if(mounted){
+          _onDataReceived(data);
+        }
       });
 
       // ルームユーザーの接続を解除している時
@@ -1133,7 +1188,7 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
     MediaStream stream =
         await navigator.mediaDevices.getUserMedia(mediaConstraints);
 
-    if (stream != null) {
+    if (stream != null && mounted) {
       setState(() {
         _localRTCVideoRenderer.srcObject = stream;
       });
@@ -1157,9 +1212,13 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
       // before skipping to the next one. 1 second is just an heuristic value
       // and should be thoroughly tested in your own environment.
       await Future.delayed(
-          const Duration(seconds: 1),
+          const Duration(seconds: 2),
           () => socket!.emit("IceCandidate",
               {"roomId": _roomName, "iceCandidate": iceCandidate}));
+      //if(socket != null){
+        // socket!.emit("IceCandidate",
+        //         {"roomId": _roomName, "iceCandidate": iceCandidate});
+      //}
     };
 
     //スピーカーフォンをオンにする
@@ -1169,20 +1228,21 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
       print('onIceConnectionState $state');
       if (state == RTCIceConnectionState.RTCIceConnectionStateClosed ||
           state == RTCIceConnectionState.RTCIceConnectionStateFailed) {
-        stopCall();
+        // stopCall();
       }
     };
 
-    pc.onConnectionState = (event) {
+    pc.onConnectionState = (state) {
       if (pc!.connectionState == 'connected') {
         // The peers are connected!
         print('The peers are connected! ');
       }
+      print('connectionState: $state');
     };
 
     pc.onAddStream = (stream) async {
       print('onAddRemoteStream');
-      if (_remoteStream == null) {
+      if (_remoteStream == null && mounted) {
         _remoteStream = stream;
         _remoteStreams.add(stream);
         setState(() {
@@ -1228,9 +1288,10 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
     }
 
     _senders.clear();
-
     if (peerConnection != null) {
       peerConnection!.close();
+      peerConnection!.dispose();
+      peerConnection = null;
     }
 
     if (_remoteStream != null) {
@@ -1245,8 +1306,8 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
       socket!.close();
     }
 
-    setState(() {
-      peerConnection = null;
+    if(mounted){
+      setState(() {
       _remoteStreams.clear();
       remoteCandidates.clear();
       _localRTCVideoRenderer.srcObject = null;
@@ -1255,10 +1316,15 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
       _hasRemoteStream = false;
       socket = null;
     });
+    }
+  
+    await stopListeningToLocation();
   }
+
 
   // 最初の状況に戻る
   void _resetState() {
+    if(mounted){
     setState(() {
       callButtonBackgroundColor = const Color(0xFF00698D);
       callButtonText = '接続開始';
@@ -1272,24 +1338,26 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
       _hasRemoteStream = false;
       _hideRemoteVideo = false;
     });
+    }
   }
 
   // キャメラ切り替え
   void _switchCamera() async {
     if (_localStream != null) {
-      // recreate stream when came to foregraound
-      _localStream = await createStream();
-      // ignore: avoid_function_literals_in_foreach_calls
-      _senders.forEach((sender) {
-        if (sender.track!.kind == 'video') {
-          sender.replaceTrack(_localStream!.getVideoTracks()[0]);
-        }
-      });
-
       // ignore: deprecated_member_use
       _localStream!.getVideoTracks()[0].switchCamera();
       isFrontCameraSelected = !isFrontCameraSelected;
     }
+  }
+
+  resumeLocalStream() async {
+    _localStream = await createStream();
+    // ignore: avoid_function_literals_in_foreach_calls
+    _senders.forEach((sender) {
+      if (sender.track!.kind == 'video') {
+        sender.replaceTrack(_localStream!.getVideoTracks()[0]);
+      }
+    });
   }
 
   // [OK]ボタンがあるAlertダイアログ
@@ -1308,6 +1376,11 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
             TextButton(
               onPressed: () {
                 _disconnectUser = false;
+                // ignore: use_build_context_synchronously
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) =>  CallP2pMeshScreen(loginToken, title: _systemName)),
+                );
                 Navigator.of(context).pop(); // Close the dialog
               },
               child: const Text('OK'),
@@ -1317,6 +1390,11 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
       },
     ).then((value) {
       _disconnectUser = false;
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) =>  CallP2pMeshScreen(loginToken, title: _systemName)),
+      );
     });
   }
 
@@ -1417,7 +1495,9 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
 
   Future<void> _leaveRoom() async {
     debugPrint("_leaveRoom:");
-    socket!.emit('leaveRoom', {"roomId": _roomName});
+    if(socket != null){
+      socket!.emit('leaveRoom', {"roomId": _roomName});
+    }
   }
 
   void _onDataReceived(data) async {
@@ -2097,10 +2177,12 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
     String jsonStringExamFlg = jsonEncode(examFlg);
 
     // send data to remote peer over signallingA
-    socket!.emit('sendData', {
-      "roomId": _roomName,
-      "data": jsonStringExamFlg,
-    });
+    if(socket != null){
+      socket!.emit('sendData', {
+        "roomId": _roomName,
+        "data": jsonStringExamFlg,
+      });
+    }
   }
 
   void _sendPartnerInfo() async {
@@ -2110,11 +2192,12 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
       "roomData": {"isExaminationStarted": false}
     };
     String jsonStringPartnerInfo = jsonEncode(partnerInfo);
-
-    socket!.emit('sendData', {
-      "roomId": _roomName,
-      "data": jsonStringPartnerInfo,
-    });
+    if(socket != null){
+      socket!.emit('sendData', {
+        "roomId": _roomName,
+        "data": jsonStringPartnerInfo,
+      });
+    }
   }
 
   void _sendScreenCaputerInfo(isStart) async {
@@ -2135,11 +2218,12 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
       "endExam": true,
     };
     String jsonStringExamFlg = jsonEncode(examFlg);
-
-    socket!.emit('sendData', {
-      "roomId": _roomName,
-      "data": jsonStringExamFlg,
-    });
+    if(socket != null){
+      socket!.emit('sendData', {
+        "roomId": _roomName,
+        "data": jsonStringExamFlg,
+      });
+    }
   }
 
   void callCreateConnection(userNo) {
@@ -2168,13 +2252,36 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen> {
     }
   }
 
+  // call when the widget is removed, release resources
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _localRTCVideoRenderer.dispose();
+    _remoteRTCVideoRenderer.dispose();
+    _localStream?.dispose();
+    peerConnection?.dispose();
     super.dispose();
   }
 
+  // @override
+  // void didUpdateWidget(CallP2pMeshScreen oldWidget) {
+  //   super.didUpdateWidget(oldWidget);
+  // }
+
+  // cleanup before widget is remove
   @override
-  void didUpdateWidget(CallP2pMeshScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
+  deactivate() {
+    super.deactivate();
+    socket?.close();
+    _localRTCVideoRenderer.dispose();
+    _remoteRTCVideoRenderer.dispose();
+  }
+
+  //  prevent the setState() called after dispose()
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
   }
 }

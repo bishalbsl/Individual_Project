@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+// import 'package:online_communication/webrtc_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:socket_io_client/socket_io_client.dart';
@@ -14,6 +15,12 @@ import 'package:permission_handler/permission_handler.dart' as permission;
 import 'package:device_info_plus/device_info_plus.dart';
 import 'login_screen.dart';
 import 'screen_capture.dart';
+
+import 'environments.dart';
+import 'webrtc_unit.dart';
+
+// JsonEncoder _encoder = JsonEncoder();
+// JsonDecoder _decoder = JsonDecoder();
 
 int? loginUserNo = 1;
 String _roomName = '';
@@ -70,6 +77,25 @@ class User {
   }
 }
 
+// typedef void StreamStateCallback(Session session, MediaStream stream);
+
+// class Session {
+//   Session({required this.localId, required this.remoteId});
+//   String localId;
+//   String remoteId;
+//   RTCPeerConnection? pc;
+//   // RTCDataChannel dc;
+//   List<RTCIceCandidate> remoteCandidates = [];
+// }
+
+class WebRTCStatus {
+  // bool isUserName = false;
+  bool isCall = false;
+  bool isReceive = false;
+  // String myId = '';
+  // String myUserName = '';
+}
+
 class CallP2pMeshScreen extends StatefulWidget {
   const CallP2pMeshScreen(this.loginToken, {super.key, required this.title});
 
@@ -83,12 +109,25 @@ class CallP2pMeshScreen extends StatefulWidget {
 
 class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
     with WidgetsBindingObserver {
+  // static final WebrtcState _initialState = WebrtcState();
+
+  // _CallP2pMeshScreenState(this.) : super(_initialState);
+
   // signalling server url
   // final String websocketUrl = "http://10.100.9.7:5555";
   final String websocketUrl = "http://192.168.11.3:3500";
 
   // socket instance
   Socket? socket;
+
+  ConnectWebRTC _connectWebRTC = ConnectWebRTC();
+  WebRTCStatus _status = WebRTCStatus();
+  List<dynamic> _users = [];
+  StreamStateCallback? _onLocalStream;
+
+  RTCVideoRenderer _localRenderer = RTCVideoRenderer();
+  RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
+  // Socket? _channel;
 
   // videoRenderer for localPeer
   RTCVideoRenderer _localRTCVideoRenderer = RTCVideoRenderer();
@@ -112,6 +151,8 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
   List<MediaStream> _remoteStreams = <MediaStream>[];
 
   List<RTCRtpSender> _senders = <RTCRtpSender>[];
+
+  // final WebrtcInteractor _interactor;
 
   // media status
   bool isAudioOn = true, isVideoOn = true, isFrontCameraSelected = true;
@@ -195,22 +236,239 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
     WidgetsBinding.instance.addObserver(this);
     super.initState();
     init();
+
+    _onLocalStream = ((_, stream) {
+      setState(() {
+        _localRenderer.srcObject = stream;
+      });
+    });
+    // initRenderers1();
+  }
+
+  initRenderers1() async {
+    await _localRenderer.initialize();
+    await _remoteRenderer.initialize();
+
+    _connectWebRTC.onAddRemoteStream = ((_, stream) {
+      setState(() {
+        _remoteRenderer.srcObject = stream;
+      });
+    });
+
+    _connectWebRTC.onRemoveRemoteStream = ((_, stream) {
+      setState(() {
+        _remoteRenderer.srcObject = null;
+      });
+    });
+
+    // _channel = socket;
+
+    // _channel = io(websocketUrl, {
+    //   "transports": ['websocket'],
+    //   "auth": {"key": "kOvEFJ3pBzvj8="},
+    //   'cors': {
+    //     'origin': 'localhost',
+    //     'credentials': true,
+    //   },
+    // });
+    socket = io(
+      Environments.WsServer, // websocketUrl,
+      OptionBuilder()
+          .setTransports(['websocket'])
+          .enableForceNew() //close and reconnect
+          .build(),
+    );
+
+    // listen onConnect event
+    socket!.on('connect', (data) async {
+      print('open socket:');
+      //Make an initial call
+      // if (mounted) startCall();
+
+      // 接続開始時間
+      startTime = DateTime.now();
+      // await _checkLocationPermission();
+
+      MediaStream stream = await _createStream();
+      _onLocalStream?.call(null, stream);
+      // _connectWebRTC.invite(_status.myId, id, stream, _channel!, _roomName);
+      _connectWebRTC.invite(stream, socket!, _roomName);
+      setState(() {
+        _status.isCall = true;
+      });
+    });
+
+    // create and join room
+    socket!.emit("createRoom", {
+      "roomId": _roomName,
+    });
+
+    socket!.on('newCall', (data) async {
+      Map messageMap = data['sdpOffer'];
+      // print('newCall data : $messageMap');
+      //if (messageMap.containsKey('offer')) {
+      MediaStream stream = await _createStream();
+      _onLocalStream?.call(null, stream);
+      // Map offer = messageMap['offer'];
+      Map offer = messageMap;
+      // _connectWebRTC.receiveOffer(_status.myId, messageMap['requestId'],
+      //     stream, socket!, offer['sdp'], offer['type'], _roomName);
+      print('inside newcall');
+
+      _connectWebRTC.receiveOffer(
+          stream, socket!, offer['sdp'], offer['type'], _roomName);
+      setState(() {
+        _status.isReceive = true;
+      });
+      //}
+    });
+
+    socket!.on('callAnswered', (data) async {
+      Map messageMap = data['sdpAnswer'];
+      //if (messageMap.containsKey('answer')) {
+      // Map answer = messageMap['answer'];
+      Map answer = messageMap;
+      _connectWebRTC.returnAnswer(answer['sdp'], answer['type']);
+      //}
+    });
+
+    socket!.on("IceCandidate", (data) async {
+      Map messageMap = data['iceCandidate'];
+
+      // var candidateMap = data['iceCandidate'];
+      //if (messageMap.containsKey('candidate')) {
+      // Map candidate = messageMap['iceCandidate'];
+      Map candidate = messageMap;
+      // print("GOT ICE candidate");
+      // print('candidate: $candidate');
+      _connectWebRTC.setCandidate(
+          // _status.myId,
+          // messageMap['requestId'],
+          candidate['candidate'],
+          candidate['sdpMid'],
+          candidate['sdpMLineIndex']);
+      //}
+    });
+
+    socket!.on('receivedData', (data) {
+      if (mounted) {
+        _onDataReceived(data);
+      }
+    });
+
+    // _channel!.on('leaveRoom',(data) async {
+    //         print('inside disconnect user');
+
+    //   _showCallLog();
+    //   _resetState();
+    //   _disconnect1(true);
+
+    // });
+
+    socket!.on('disconnectUser', (data) async {
+      print('inside disconnect user');
+      //if (messageMap.containsKey('disconnect')) {
+      _disconnect1(true);
+      _leaveRoom();
+      // _channel!.emit('leaveRoom', {"roomId": _roomName});
+
+      // _disconnect();
+      // endFlgUpdate(widget.loginToken, selectedRoomCd!);
+      _showCallLog();
+      _resetState();
+      //}
+    });
+
+    socket!.connect();
+  }
+
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  //   _localRenderer.srcObject = null;
+  //   _remoteRenderer.srcObject = null;
+  //   _localRenderer.dispose();
+  //   _remoteRenderer.dispose();
+  // }
+
+  Future<MediaStream> _createStream() async {
+    final Map<String, dynamic> mediaConstraints = {
+      'audio': true,
+      'video': true,
+      // {
+      //   'mandatory': {
+      //     'minWidth': '640',
+      //     'minHeight': '480',
+      //     'minFrameRate': '30',
+      //   },
+      //   ...WebRTC.platformIsDesktop ? {} : {'facingMode': 'user'},
+      //   // 'optional': [],
+      // }
+    };
+
+    MediaStream stream =
+        await navigator.mediaDevices.getUserMedia(mediaConstraints);
+    return stream;
+  }
+
+  void _onCall(id) async {
+    await initRenderers1();
+
+    // MediaStream stream = await _createStream();
+    // _onLocalStream?.call(null, stream);
+    // // _connectWebRTC.invite(_status.myId, id, stream, _channel!, _roomName);
+    // _connectWebRTC.invite(stream, _channel!, _roomName);
+    // setState(() {
+    //   _status.isCall = true;
+    // });
+  }
+
+  void _disconnect1(bool isByeReceive) async {
+    // await _connectWebRTC.disconnect(isByeReceive);
+    _connectWebRTC.disconnect(isByeReceive);
+    _localRenderer.srcObject = null;
+    _remoteRenderer.srcObject = null;
+    _localRenderer.dispose();
+    _remoteRenderer.dispose();
+    close();
+
+    _localRenderer = RTCVideoRenderer();
+    _remoteRenderer = RTCVideoRenderer();
+    _localRenderer.initialize();
+    _remoteRenderer.initialize();
+    setState(() {
+      _status.isCall = false;
+      _status.isReceive = false;
+    });
+    _connectWebRTC = ConnectWebRTC();
+  }
+
+  close() {
+    try {
+      socket!.disconnect();
+      socket!.close();
+      socket!.destroy();
+      socket = null;
+      print('SOCKET DISCONNECTED');
+    } catch (e) {
+      print(e);
+    }
   }
 
   init() async {
     _loadPrefs();
     futureRooms = fetchRoom(widget.loginToken);
     loadMyInfo(widget.loginToken);
-    _initCustomMarkerIcon();
-    _checkLocationPermission();
+    // _initCustomMarkerIcon();
+    // _checkLocationPermission();
     if (WebRTC.platformIsAndroid) {
       _getDeviceInfo();
     }
   }
 
   initRenderers() async {
-    _localRTCVideoRenderer = RTCVideoRenderer();
-    _remoteRTCVideoRenderer = RTCVideoRenderer();
+    // _localRTCVideoRenderer = RTCVideoRenderer();
+    // _remoteRTCVideoRenderer = RTCVideoRenderer();
     await _localRTCVideoRenderer.initialize();
     await _remoteRTCVideoRenderer.initialize();
   }
@@ -624,26 +882,27 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
                 ),
               ),
               // ロカルvideo
-              if (isConnected)
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    padding: const EdgeInsets.all(4.0),
-                    width: w * 0.6,
-                    height: h * 0.6,
-                    child: RTCVideoView(
-                      _localRTCVideoRenderer,
-                      mirror: isFrontCameraSelected,
-                      // objectFit:
-                      //     RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                    ),
+              // if (isConnected)
+              Expanded(
+                flex: 1,
+                child: Container(
+                  padding: const EdgeInsets.all(4.0),
+                  width: w * 0.6,
+                  height: h * 0.6,
+                  child: RTCVideoView(
+                    _localRTCVideoRenderer,
+                    // _localRenderer,
+                    mirror: isFrontCameraSelected,
+                    // objectFit:
+                    //     RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                   ),
-                )
-              else
-                Expanded(
-                  flex: 1,
-                  child: Container(),
                 ),
+              )
+              // else
+              //   Expanded(
+              //     flex: 1,
+              //     child: Container(),
+              //   ),
             ],
           ),
         ),
@@ -684,6 +943,7 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
             flex: 1,
             child: RTCVideoView(
               _remoteRTCVideoRenderer,
+              // _remoteRenderer,
               objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
             ),
           ),
@@ -987,14 +1247,25 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
     await initRenderers();
     // Connect the socket...
     try {
-      socket = io(websocketUrl, {
-        "transports": ['websocket'],
-        "auth": {"key": "kOvEFJ3pBzvj8="},
-        'cors': {
-          'origin': 'localhost',
-          'credentials': true,
-        },
-      });
+      // socket = io(websocketUrl, {
+      //   "transports": ['websocket'],
+      //   "auth": {"key": "kOvEFJ3pBzvj8="},
+      //   'cors': {
+      //     'origin': 'localhost',
+      //     'credentials': true,
+      //   },
+      // });
+      String authKey = Environments.authKey;
+      socket = io(
+        Environments.WsServer, // websocketUrl,
+        OptionBuilder()
+            .setTransports(['websocket'])
+            .enableForceNew() //close and reconnect
+            .setQuery({
+              "auth": "key=$authKey"
+            }) // include authentication key in the query
+            .build(),
+      );
 
       // listen onConnect event
       socket!.on('connect', (data) async {
@@ -1012,15 +1283,10 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
         var description = data['sdpOffer'];
         var pc = await _createPeerConnection();
         peerConnection = pc;
-        // if (pc.connectionState == RTCSignalingState.RTCSignalingStateStable) {
-        //   await pc.setRemoteDescription(
-        //       RTCSessionDescription(description['sdp'], description['type']));
-        // } else {
-        //   // Handle the case where the connection state is not stable
-        //   print('Connection state is not stable for setRemoteDescription');
-        // }
-        await pc.setRemoteDescription(
-            RTCSessionDescription(description['sdp'], description['type']));
+        if (description != null) {
+          await pc.setRemoteDescription(
+              RTCSessionDescription(description['sdp'], description['type']));
+        }
         await _createAnswer(pc);
         if (remoteCandidates.length > 0) {
           remoteCandidates.forEach((candidate) async {
@@ -1028,7 +1294,6 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
           });
           remoteCandidates.clear();
         }
-        //  peerConnection = pc;
       });
 
       // listen for Remote IceCandidate
@@ -1052,29 +1317,14 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
         print('callAnswered');
         var description = data['sdpAnswer'];
         var pc = peerConnection;
-        if (pc != null) {
-          await pc.setRemoteDescription(
+        if (description != null) {
+          await pc?.setRemoteDescription(
               RTCSessionDescription(description['sdp'], description['type']));
         }
-        // var state = peerConnection!.onSignalingState;
-        // print('peerConnectionState: $state');
-        // if (peerConnection!.connectionState == RTCSignalingState.RTCSignalingStateStable) {
-        //   await peerConnection!.setRemoteDescription(
-        //       RTCSessionDescription(description['sdp'], description['type']));
-        // } else {
-        //   // Handle the case where the connection state is not stable
-        //   print('Connection state is not stable for setRemoteDescription');
-        // }
-        // if (peerConnection != null) {
-        //   await peerConnection!.setRemoteDescription(
-        //       RTCSessionDescription(description['sdp'], description['type']));
-        // }
       });
 
       socket!.on('receivedData', (data) {
-        if (mounted) {
-          _onDataReceived(data);
-        }
+        _onDataReceived(data);
       });
 
       // ルームユーザーの接続を解除している時
@@ -1195,87 +1445,98 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
   }
 
   _createPeerConnection() async {
-    _localStream = await createStream();
     RTCPeerConnection? pc = await createPeerConnection(_iceServers, _config);
 
-    pc.onIceCandidate = (candidate) async {
-      var iceCandidate = {
-        'sdpMLineIndex': candidate.sdpMLineIndex,
-        'sdpMid': candidate.sdpMid,
-        'candidate': candidate.candidate,
-      };
-      print('iceCandidate$iceCandidate');
-      if (iceCandidate != null) {
-        await Future.delayed(
-            const Duration(seconds: 2),
-            () => socket!.emit("IceCandidate",
-                {"roomId": _roomName, "iceCandidate": iceCandidate}));
-      }
-
-      // This delay is needed to allow enough time to try an ICE candidate
-      // before skipping to the next one. 1 second is just an heuristic value
-      // and should be thoroughly tested in your own environment.
-
-      //if(socket != null){
-      // socket!.emit("IceCandidate",
-      //         {"roomId": _roomName, "iceCandidate": iceCandidate});
-      //}
-    };
-
+    _localStream = await createStream();
     //スピーカーフォンをオンにする
-    // _localStream!.getAudioTracks()[0].enableSpeakerphone(true);
+    if (WebRTC.platformIsMobile)
+      _localStream!.getAudioTracks()[0].enableSpeakerphone(true);
+
+    // pc.addStream(_localStream!);  //problem in mobile
+    _localStream!.getTracks().forEach((track) async {
+      _senders.add(await pc.addTrack(track, _localStream!));
+    });
+
+    pc.onConnectionState = (RTCPeerConnectionState state) {
+      // if (pc!.connectionState == 'connected') {
+      //   // The peers are connected!
+      //   print('The peers are connected! ');
+      // }
+      // print('onConnectionState: $state');
+      print('this offer Connection state change: $state');
+    };
 
     pc.onIceConnectionState = (state) {
       print('onIceConnectionState $state');
       if (state == RTCIceConnectionState.RTCIceConnectionStateClosed ||
           state == RTCIceConnectionState.RTCIceConnectionStateFailed ||
           state == RTCIceConnectionState.RTCIceConnectionStateDisconnected) {
-        // stopCall();
-        // _leaveRoom();
-        // _disconnect();
-        // endFlgUpdate(widget.loginToken, selectedRoomCd!);
+        stopCall();
+        _leaveRoom();
+        _disconnect();
+        endFlgUpdate(widget.loginToken, selectedRoomCd!);
         // _showCallLog();
-        // _resetState();
+        _resetState();
       }
-    };
-
-    pc.onConnectionState = (state) {
-      if (pc!.connectionState == 'connected') {
-        // The peers are connected!
-        print('The peers are connected! ');
-      }
-      print('onConnectionState: $state');
     };
 
     pc.onAddStream = (stream) async {
       print('onAddRemoteStream');
-      if (_remoteStream == null && mounted) {
-        _remoteStream = stream;
-        _remoteStreams.add(stream);
-        setState(() {
-          _remoteRTCVideoRenderer.srcObject = _remoteStream;
-          _hasRemoteStream = true;
-        });
-        _sendPartnerInfo();
+      // if (_remoteStream == null && mounted) {
+      _remoteStream = stream;
+      // _remoteStreams.add(stream);
+      setState(() {
+        _remoteRTCVideoRenderer.srcObject = _remoteStream;
+        _hasRemoteStream = true;
+      });
+      _sendPartnerInfo();
+      // }
+    };
+
+    pc.onTrack = (event) {
+      event.streams[0]
+          .getTracks()
+          .forEach((track) => _remoteStream?.addTrack(track));
+    };
+
+    pc.onIceCandidate = (candidate) async {
+      if (candidate.candidate != null) {
+        var iceCandidate = {
+          'sdpMLineIndex': candidate.sdpMLineIndex,
+          'sdpMid': candidate.sdpMid,
+          'candidate': candidate.candidate,
+        };
+        // print('iceCandidate$iceCandidate');
+        await Future.delayed(
+            const Duration(seconds: 2),
+            () => socket!.emit("IceCandidate",
+                {"roomId": _roomName, "iceCandidate": iceCandidate}));
+
+        // This delay is needed to allow enough time to try an ICE candidate
+        // before skipping to the next one. 1 second is just an heuristic value
+        // and should be thoroughly tested in your own environment.
+
+        // if (socket != null) {
+        //   socket!.emit("IceCandidate",
+        //       {"roomId": _roomName, "iceCandidate": iceCandidate});
+        // }
       }
     };
 
-    _localStream!.getTracks().forEach((track) async {
-      _senders.add(await pc!.addTrack(track, _localStream!));
-    });
+    // _createOffer(pc);
 
-    pc.onRemoveStream = (stream) {
-      print('remoteStream...$_remoteStreams');
-      setState(() {
-        _remoteRTCVideoRenderer.srcObject = null;
-        _hasRemoteStream = false;
-        pc = null;
-      });
-      // _showCallLog();
-      _remoteStreams.removeWhere((it) {
-        return (it.id == stream.id);
-      });
-    };
+    // pc.onRemoveStream = (stream) {
+    //   print('remoteStream...$_remoteStreams');
+    //   setState(() {
+    //     _remoteRTCVideoRenderer.srcObject = null;
+    //     _hasRemoteStream = false;
+    //     pc = null;
+    //   });
+    //   // _showCallLog();
+    //   _remoteStreams.removeWhere((it) {
+    //     return (it.id == stream.id);
+    //   });
+    // };
 
     return pc;
   }
@@ -1286,6 +1547,10 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
   }
 
   stopCall() async {
+    if (peerConnection != null) {
+      peerConnection!.close();
+      peerConnection = null;
+    }
     if (_localStream != null) {
       _localStream!.getTracks().forEach((track) async {
         await track.stop();
@@ -1293,13 +1558,7 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
       await _localStream!.dispose();
       _localStream = null;
     }
-
     _senders.clear();
-    if (peerConnection != null) {
-      peerConnection!.close();
-      peerConnection!.dispose();
-      peerConnection = null;
-    }
 
     if (_remoteStream != null) {
       _remoteStream!.getTracks().forEach((track) async {
@@ -1308,35 +1567,40 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
       await _remoteStream!.dispose();
       _remoteStream = null;
     }
-    if (socket != null) {
-      socket!.disconnect();
-      socket!.close();
-    }
+    _remoteStreams.clear();
+    remoteCandidates.clear();
 
-    if (mounted) {
-      setState(() {
-        _remoteStreams.clear();
-        remoteCandidates.clear();
-        _localRTCVideoRenderer.srcObject = null;
-        _remoteRTCVideoRenderer.srcObject = null;
-        isConnected = false;
-        _hasRemoteStream = false;
-        socket = null;
-      });
-    }
+    _localRTCVideoRenderer.srcObject = null;
+    _remoteRTCVideoRenderer.srcObject = null;
+    _localRTCVideoRenderer.dispose();
+    _remoteRTCVideoRenderer.dispose();
 
+    close();
+
+    _localRTCVideoRenderer = RTCVideoRenderer();
+    _remoteRTCVideoRenderer = RTCVideoRenderer();
+    _localRTCVideoRenderer.initialize();
+    _remoteRTCVideoRenderer.initialize();
+
+    setState(() {
+      isConnected = false;
+      _hasRemoteStream = false;
+    });
     await stopListeningToLocation();
   }
 
   // call when the widget is removed, release resources
   @override
   void dispose() {
+    super.dispose();
     WidgetsBinding.instance.removeObserver(this);
-    // _localRTCVideoRenderer.dispose();
-    // _remoteRTCVideoRenderer.dispose();
     _localStream?.dispose();
     peerConnection?.dispose();
-    super.dispose();
+
+    _localRTCVideoRenderer.srcObject = null;
+    _remoteRTCVideoRenderer.srcObject = null;
+    _localRTCVideoRenderer.dispose();
+    _remoteRTCVideoRenderer.dispose();
   }
 
   // @override
@@ -1345,13 +1609,13 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
   // }
 
   // cleanup before widget is remove
-  @override
-  deactivate() {
-    super.deactivate();
-    socket?.close();
-    _localRTCVideoRenderer.dispose();
-    _remoteRTCVideoRenderer.dispose();
-  }
+  // @override
+  // deactivate() {
+  //   super.deactivate();
+  //   socket?.close();
+  //   _localRTCVideoRenderer.dispose();
+  //   _remoteRTCVideoRenderer.dispose();
+  // }
 
   //  prevent the setState() called after dispose()
   @override
@@ -1363,21 +1627,19 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
 
   // 最初の状況に戻る
   void _resetState() {
-    if (mounted) {
-      setState(() {
-        callButtonBackgroundColor = const Color(0xFF00698D);
-        callButtonText = '接続開始';
-        callButtonState = 1;
-        shareScreenButtonText = '画面共有';
-        screenShareBackgroundColor = const Color(0xFF00698D);
-        shareScreenButtonState = 1;
-        mapButtonState = 1;
-        mapButtonText = 'マップ表示';
-        mapButtonBackgroundColor = const Color(0xFF00698D);
-        _hasRemoteStream = false;
-        _hideRemoteVideo = false;
-      });
-    }
+    setState(() {
+      callButtonBackgroundColor = const Color(0xFF00698D);
+      callButtonText = '接続開始';
+      callButtonState = 1;
+      shareScreenButtonText = '画面共有';
+      screenShareBackgroundColor = const Color(0xFF00698D);
+      shareScreenButtonState = 1;
+      mapButtonState = 1;
+      mapButtonText = 'マップ表示';
+      mapButtonBackgroundColor = const Color(0xFF00698D);
+      _hasRemoteStream = false;
+      _hideRemoteVideo = false;
+    });
   }
 
   // キャメラ切り替え
@@ -1418,13 +1680,13 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
             TextButton(
               onPressed: () {
                 _disconnectUser = false;
-                // ignore: use_build_context_synchronously
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          CallP2pMeshScreen(loginToken, title: _systemName)),
-                );
+                // // ignore: use_build_context_synchronously
+                // Navigator.pushReplacement(
+                //   context,
+                //   MaterialPageRoute(
+                //       builder: (context) =>
+                //           CallP2pMeshScreen(loginToken, title: _systemName)),
+                // );
                 Navigator.of(context).pop(); // Close the dialog
               },
               child: const Text('OK'),
@@ -1434,13 +1696,13 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
       },
     ).then((value) {
       _disconnectUser = false;
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                CallP2pMeshScreen(loginToken, title: _systemName)),
-      );
+      // // ignore: use_build_context_synchronously
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(
+      //       builder: (context) =>
+      //           CallP2pMeshScreen(loginToken, title: _systemName)),
+      // );
     });
   }
 
@@ -1547,7 +1809,7 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
   }
 
   void _onDataReceived(data) async {
-    print('receivedData $data');
+    // print('receivedData $data');
 
     // JSON Stringを解析してマップに変換する
     Map<String, dynamic> obj = json.decode(data['data']);
@@ -1568,7 +1830,7 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
         examEndTime = DateTime.now();
       });
     } else if (obj['latLng'] != null) {
-      debugPrint('latLng mapData: $data');
+      // debugPrint('latLng mapData: $data');
       setState(() {
         userLat = obj['latLng']['lat'];
         userLng = obj['latLng']['lng'];
@@ -1699,6 +1961,7 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
       });
       // ルーム作成後に接続する
       _connect();
+      // _onCall(1);
     } else {
       debugPrint('createConnection failed');
     }
@@ -1774,6 +2037,7 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
           // 接続状況を更新
           // connectionUpdate(widget.loginToken, selectedRoomCd!, loginUserNo!);
           _connect();
+          // _onCall(1);
           setState(() {
             isCallButtonEnabled = false;
             callButtonBackgroundColor = const Color(0xFF28a745);

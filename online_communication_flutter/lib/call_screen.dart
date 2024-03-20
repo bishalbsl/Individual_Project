@@ -274,7 +274,7 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
     socket = io(
       Environments.WsServer, // websocketUrl,
       OptionBuilder()
-          .setTransports(['websocket'])
+          .setTransports(['websocket', 'polling'])
           .enableForceNew() //close and reconnect
           .build(),
     );
@@ -1259,11 +1259,11 @@ class _CallP2pMeshScreenState extends State<CallP2pMeshScreen>
       socket = io(
         Environments.WsServer, // websocketUrl,
         OptionBuilder()
-            .setTransports(['websocket'])
+            .setTransports(['websocket', 'polling'])
             .enableForceNew() //close and reconnect
-            .setQuery({
-              "auth": "key=$authKey"
-            }) // include authentication key in the query
+            .setPath('/SocketServer/') // Use setPath method
+            .setQuery(
+                {"authKey": authKey}) // include authentication key in the query
             .build(),
       );
 

@@ -1,9 +1,9 @@
 class Environments {
   // static const String WsServer = 'ws://840d1d19390f.ngrok.io';
   // static const String WsServer = 'ws://localhost:8081';
-  static const String WsServer = 'http://192.168.11.3:3500';
+  static const String WsServer = 'https://192.168.11.5';
+  // static const String WsServer = 'https://signal.servertest.com';
   static const String authKey = "kOvEFJ3pBzvj8=";
-
 
   static const Map IceServers = {
     'iceServers': [

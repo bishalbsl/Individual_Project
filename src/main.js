@@ -10,6 +10,8 @@ import { faLinkedinIn, faFacebook } from '@fortawesome/free-brands-svg-icons'
 /* import font awesome icon component */
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
+import VueI18n from 'vue-i18n';
+
 /* add icons to the library */
 library.add(faEnvelope, faLinkedinIn, faFacebook)
 
@@ -18,6 +20,7 @@ Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 
 Vue.config.productionTip = false
+Vue.use(VueI18n)
 
 new Vue({
     render: h => h(App),

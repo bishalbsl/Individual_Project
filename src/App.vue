@@ -12,7 +12,6 @@
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld.vue'
 import NavBar from './components/NavBar.vue'
 import Header from './components/Header.vue'
 import About from './components/About.vue'

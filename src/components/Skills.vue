@@ -3,14 +3,14 @@
     <div class="container-fluid py-5" id="skill">
         <div class="container">
             <div class="position-relative d-flex align-items-center justify-content-center">
-                <h1 class="display-2 text-uppercase text-white" style="-webkit-text-stroke: 1px #dee2e6;">Skills</h1>
-                <h1 class="position-absolute text-uppercase text-success">My Skills</h1>
+                <h1 class="display-2 text-uppercase text-white" style="-webkit-text-stroke: 1px #dee2e6;">My Skills</h1>
+                <h1 class="position-absolute text-uppercase text-success">Skills</h1>
             </div>
             <div class="row align-items-center">
                 <div class="col-md-6">
                     <div class="skill mb-4">
                        <div class="w3-light-grey" style="border-radius: 10px;">
-                            <div class="w3-green" style="height:24px;width:90%; border-radius: 10px;">HTML</div>
+                            <div class="w3-green" style="height:24px;width:95%; border-radius: 10px;">HTML</div>
                         </div>
                             <!-- <div class="d-flex justify-content-between">
                                 <h6 class="font-weight-bold">HTML</h6>
@@ -23,7 +23,7 @@
                     </div>
                     <div class="skill mb-4">
                         <div class="w3-light-grey" style="border-radius: 10px;">
-                            <div class="w3-green" style="height:24px;width:85%; border-radius: 10px;">CSS</div>
+                            <div class="w3-green" style="height:24px;width:90%; border-radius: 10px;">CSS</div>
                         </div>
                         <!-- <div class="d-flex justify-content-between">
                             <h6 class="font-weight-bold">CSS</h6>
@@ -35,7 +35,7 @@
                     </div>
                               <div class="skill mb-4">
                         <div class="w3-light-grey" style="border-radius: 10px;">
-                            <div class="w3-green" style="height:24px;width:80%; border-radius: 10px;">Javascript</div>
+                            <div class="w3-green" style="height:24px;width:85%; border-radius: 10px;">Javascript</div>
                         </div>
                         <!-- <div class="d-flex justify-content-between">
 
@@ -48,7 +48,12 @@
                     </div>
                     <div class="skill mb-4">
                         <div class="w3-light-grey" style="border-radius: 10px;">
-                            <div class="w3-green" style="height:24px;width:60%; border-radius: 10px;">PHP</div>
+                            <div class="w3-green" style="height:24px;width:85%; border-radius: 10px;">Vue.js</div>
+                        </div>
+                    </div>
+                    <div class="skill mb-4">
+                        <div class="w3-light-grey" style="border-radius: 10px;">
+                            <div class="w3-green" style="height:24px;width:65%; border-radius: 10px;">PHP</div>
                         </div>
                         <!-- <div class="d-flex justify-content-between">
                             <h6 class="font-weight-bold">PHP</h6>
@@ -58,12 +63,13 @@
                             <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
                         </div> -->
                     </div>
+                    
                 </div>
                 <div class="col-md-6">
           
                     <div class="skill mb-4">
                         <div class="w3-light-grey" style="border-radius: 10px;">
-                            <div class="w3-green" style="height:24px;width:78%; border-radius: 10px;">C#</div>
+                            <div class="w3-green" style="height:24px;width:85%; border-radius: 10px;">C#</div>
                         </div>
                         <!-- <div class="d-flex justify-content-between">
                             <h6 class="font-weight-bold">C#</h6>
@@ -75,7 +81,7 @@
                     </div>
                               <div class="skill mb-4">
                         <div class="w3-light-grey" style="border-radius: 10px;">
-                            <div class="w3-green" style="height:24px;width:76%; border-radius: 10px;">Java</div>
+                            <div class="w3-green" style="height:24px;width:78%; border-radius: 10px;">Java</div>
                         </div>
                         <!-- <div class="d-flex justify-content-between">
 
@@ -88,7 +94,12 @@
                     </div>
                     <div class="skill mb-4">
                         <div class="w3-light-grey" style="border-radius: 10px;">
-                            <div class="w3-green" style="height:24px;width:75%; border-radius: 10px;">Vuejs</div>
+                            <div class="w3-green" style="height:24px;width:80%; border-radius: 10px;">Python</div>
+                        </div>
+                    </div>
+                    <div class="skill mb-4">
+                        <div class="w3-light-grey" style="border-radius: 10px;">
+                            <div class="w3-green" style="height:24px;width:85%; border-radius: 10px;">SQL</div>
                         </div>
                         <!-- <div class="d-flex justify-content-between">
                             <h6 class="font-weight-bold">Vuejs</h6>
@@ -100,16 +111,10 @@
                     </div>
                     <div class="skill mb-4">
                         <div class="w3-light-grey" style="border-radius: 10px;">
-                            <div class="w3-green" style="height:24px;width:60%; border-radius: 10px;">Python</div>
+                            <div class="w3-green" style="height:24px;width:65%; border-radius: 10px;">Objective-c</div>
                         </div>
-                        <!-- <div class="d-flex justify-content-between">
-                            <h6 class="font-weight-bold">Python</h6>
-                            <h6 class="font-weight-bold">50%</h6>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar bg-info" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div> -->
                     </div>
+                    
                 </div>
             </div>
         </div>
